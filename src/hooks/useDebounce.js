@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 
 function useDebounce(input, delay) {
-  const [state, setState] = useState(input);
+  const [state, setState] = useState(input)
 
   useEffect(() => {
     const timerId = setTimeout(() => {
-      setState(input);
-    }, delay);
+      setState(input)
+    }, delay)
 
-    return () => clearTimeout(timerId);
-  }, [input, delay]);
+    return () => clearTimeout(timerId)
+  }, [input, delay])
 
-  return state;
+  return state
 }
 
-export default useDebounce;
+export default useDebounce

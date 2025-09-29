@@ -1,5 +1,5 @@
 const DefaultLayout = () => {
-  return <div>DefaultLayout</div>;
-};
+  return <div>DefaultLayout</div>
+}
 
-export default DefaultLayout;
+export default DefaultLayout

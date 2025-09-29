@@ -1,8 +1,8 @@
-import AppRoutes from "@components/AppRoutes";
-import "./styles/tailwind.css";
+import AppRoutes from '@components/AppRoutes'
+import './styles/tailwind.css'
 
 function App() {
-  return <AppRoutes />;
+  return <AppRoutes />
 }
 
-export default App;
+export default App
