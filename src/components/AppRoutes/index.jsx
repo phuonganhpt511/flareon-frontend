@@ -1,12 +1,25 @@
 import { BrowserRouter, Route, Routes } from 'react-router'
 
+import AdminLayout from '@/layouts/AdminLayout'
+import DefaultLayout from '@/layouts/DefaultLayout'
+
 import Home from '@/pages/Home'
+import AboutPage from '@/pages/AboutPage'
+import Dashboard from '@/pages/Dashboard'
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        {/* Admin layout pages */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+        </Route>
+        {/* Default layout pages */}
+        <Route element={<DefaultLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<AboutPage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   )

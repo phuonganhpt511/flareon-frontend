@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
@@ -8,10 +9,11 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      // eslint-disable-next-line no-undef
-      "@": path.resolve(__dirname, "src"),
-      // eslint-disable-next-line no-undef
-      '@components': path.resolve(__dirname, './src/components'),
-    }
-  }
+      '@': path.resolve(__dirname, 'src'),
+      '@components': path.resolve(__dirname, 'src/components'),
+      '@pages': path.resolve(__dirname, 'src/pages'),
+      '@layouts': path.resolve(__dirname, 'src/layouts'),
+      '@hooks': path.resolve(__dirname, 'src/hooks'),
+    },
+  },
 })
