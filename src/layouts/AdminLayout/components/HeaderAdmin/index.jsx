@@ -1,13 +1,5 @@
 import React from 'react'
-import {
-  Layout,
-  Breadcrumb,
-  Avatar,
-  Menu,
-  Input,
-  Button,
-  Dropdown,
-} from 'antd'
+import { Layout, Avatar, Menu, Input, Button, Dropdown } from 'antd'
 import { BellOutlined, SearchOutlined, UserOutlined, DownOutlined } from '@ant-design/icons'
 
 const { Header } = Layout
@@ -25,9 +17,7 @@ const HeaderAdmin = () => {
   )
   return (
     <Header className="!bg-white px-4">
-      <div className="flex items-center justify-between">
-        <Breadcrumb items={[{ title: 'Trang chủ' }, { title: 'Tổng quan' }]} />
-
+      <div className="flex justify-end">
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center px-3 py-1.5 rounded-xl bg-gray-50 border">
             <SearchOutlined className="mr-2" />

@@ -1,14 +1,5 @@
 import React, { useMemo } from 'react'
-import {
-  Layout,
-  Card,
-  Statistic,
-  Table,
-  Tag,
-  Progress,
-  Avatar,
-  List,
-} from 'antd'
+import { Layout, Card, Statistic, Table, Tag, Progress, Avatar, List, Breadcrumb } from 'antd'
 const { Content } = Layout
 
 const revenueData = [
@@ -125,7 +116,11 @@ export default function Dashboard() {
 
   return (
     <>
-      <h1 className="px-4 mt-4 md:px-6 md:pt-6 font-bold text-3xl">Trang tổng quan</h1>
+      <section className='px-4 md:px-6 md:pt-6'>
+        <h1 className="font-bold text-3xl mb-2">Trang tổng quan</h1>
+        <Breadcrumb items={[{ title: 'Trang chủ' }, { title: 'Tổng quan' }]} />
+      </section>
+
       <Content className="p-4 md:p-6">
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
