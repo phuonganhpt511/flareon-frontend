@@ -1,13 +1,20 @@
 import { Outlet } from 'react-router'
-import Sidebar from './components/Sidebar'
 import { Layout } from 'antd'
+
+import Sidebar from './components/Sidebar'
+import HeaderAdmin from './components/HeaderAdmin'
+import FooterAdmin from './components/FooterAdmin'
 
 const AdminLayout = () => {
   return (
     <>
       <Layout className="min-h-screen bg-white">
         <Sidebar />
-        <Outlet />
+        <Layout>
+          <HeaderAdmin />
+          <Outlet />
+          <FooterAdmin />
+        </Layout>
       </Layout>
     </>
   )
