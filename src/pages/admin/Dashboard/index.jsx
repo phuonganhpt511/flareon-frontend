@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react'
 import {
   Layout,
-  Menu,
-  Breadcrumb,
   Card,
   Statistic,
   Table,
@@ -10,14 +8,8 @@ import {
   Progress,
   Avatar,
   List,
-  Button,
-  Dropdown,
-  Space,
-  Input,
 } from 'antd'
-import { BellOutlined, SearchOutlined, UserOutlined, DownOutlined } from '@ant-design/icons'
-
-const { Header, Content, Footer } = Layout
+const { Content } = Layout
 
 const revenueData = [
   { key: '1', month: 'Jan', revenue: 12000, growth: 12 },
@@ -131,145 +123,108 @@ export default function Dashboard() {
     },
   ]
 
-  const userMenu = (
-    <Menu
-      items={[
-        { key: 'profile', label: 'Hồ sơ' },
-        { key: 'settings', label: 'Cài đặt' },
-        { type: 'divider' },
-        { key: 'logout', label: 'Đăng xuất' },
-      ]}
-    />
-  )
-
   return (
-    <Layout className="min-h-screen bg-white">
-      <Layout>
-        <Header className="!bg-white px-4">
-          <div className="flex items-center justify-between">
-            <Breadcrumb items={[{ title: 'Trang chủ' }, { title: 'Tổng quan' }]} />
-
-            <div className="flex items-center gap-2">
-              <div className="hidden md:flex items-center px-3 py-1.5 rounded-xl bg-gray-50 border">
-                <SearchOutlined className="mr-2" />
-                <Input bordered={false} placeholder="Tìm kiếm..." className="w-56" />
+    <>
+      <h1 className="px-4 mt-4 md:px-6 md:pt-6 font-bold text-3xl">Trang tổng quan</h1>
+      <Content className="p-4 md:p-6">
+        {/* KPIs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
+          <Card className="shadow-sm rounded-2xl">
+            <div className="flex items-start justify-between">
+              <Statistic title="Tổng doanh thu" value={k(revenue)} />
+              <div className="w-24">
+                <Sparkline values={revenueData.map((d) => d.revenue)} />
               </div>
-              <Button type="text" icon={<BellOutlined />} />
-              <Dropdown overlay={userMenu} trigger={['click']}>
-                <div className="flex items-center gap-2 cursor-pointer select-none">
-                  <Avatar icon={<UserOutlined />} />
-                  <span className="hidden md:inline">Admin</span>
-                  <DownOutlined className="text-xs" />
-                </div>
-              </Dropdown>
             </div>
-          </div>
-        </Header>
+            <div className="mt-2 text-sm text-gray-500">6 tháng gần nhất</div>
+          </Card>
 
-        <Content className="p-4 md:p-6">
-          {/* KPIs */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
-            <Card className="shadow-sm rounded-2xl">
-              <div className="flex items-start justify-between">
-                <Statistic title="Tổng doanh thu" value={k(revenue)} />
-                <div className="w-24">
-                  <Sparkline values={revenueData.map((d) => d.revenue)} />
-                </div>
+          <Card className="shadow-sm rounded-2xl">
+            <div className="flex items-start justify-between">
+              <Statistic title="Tăng trưởng trung bình" value={growth.toFixed(1)} suffix="%" />
+              <div className="w-24">
+                <Sparkline values={revenueData.map((d) => d.growth)} />
               </div>
-              <div className="mt-2 text-sm text-gray-500">6 tháng gần nhất</div>
-            </Card>
+            </div>
+            <div className="mt-2 text-sm text-gray-500">MoM</div>
+          </Card>
 
-            <Card className="shadow-sm rounded-2xl">
-              <div className="flex items-start justify-between">
-                <Statistic title="Tăng trưởng trung bình" value={growth.toFixed(1)} suffix="%" />
-                <div className="w-24">
-                  <Sparkline values={revenueData.map((d) => d.growth)} />
-                </div>
-              </div>
-              <div className="mt-2 text-sm text-gray-500">MoM</div>
-            </Card>
+          <Card className="shadow-sm rounded-2xl">
+            <Statistic title="Tỷ lệ hoàn thành KPI" value={86} suffix="%" />
+            <div className="mt-4">
+              <Progress percent={86} showInfo={false} />
+            </div>
+          </Card>
 
-            <Card className="shadow-sm rounded-2xl">
-              <Statistic title="Tỷ lệ hoàn thành KPI" value={86} suffix="%" />
-              <div className="mt-4">
-                <Progress percent={86} showInfo={false} />
-              </div>
-            </Card>
+          <Card className="shadow-sm rounded-2xl">
+            <Statistic title="Khách hàng mới" value={324} />
+            <div className="mt-2 text-sm text-gray-500">trong 30 ngày</div>
+          </Card>
+        </div>
 
-            <Card className="shadow-sm rounded-2xl">
-              <Statistic title="Khách hàng mới" value={324} />
-              <div className="mt-2 text-sm text-gray-500">trong 30 ngày</div>
-            </Card>
-          </div>
+        {/* Content grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          <Card className="shadow-sm rounded-2xl xl:col-span-2" title="Đơn hàng gần đây">
+            <Table
+              columns={columns}
+              dataSource={orders}
+              pagination={{ pageSize: 5 }}
+              className="rounded-xl"
+            />
+          </Card>
 
-          {/* Content grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-            <Card className="shadow-sm rounded-2xl xl:col-span-2" title="Đơn hàng gần đây">
-              <Table
-                columns={columns}
-                dataSource={orders}
-                pagination={{ pageSize: 5 }}
-                className="rounded-xl"
+          <div className="flex flex-col gap-4">
+            <Card className="shadow-sm rounded-2xl" title="Hoạt động gần đây">
+              <List
+                itemLayout="horizontal"
+                dataSource={activities}
+                renderItem={(item) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={<Avatar>{item.user[0]}</Avatar>}
+                      title={
+                        <div className="flex items-center justify-between">
+                          <span>
+                            <span className="font-medium">{item.user}</span>{' '}
+                            <span className="text-gray-500">{item.action}</span>
+                          </span>
+                          <span className="text-xs text-gray-400">{item.time}</span>
+                        </div>
+                      }
+                    />
+                  </List.Item>
+                )}
               />
             </Card>
 
-            <div className="flex flex-col gap-4">
-              <Card className="shadow-sm rounded-2xl" title="Hoạt động gần đây">
-                <List
-                  itemLayout="horizontal"
-                  dataSource={activities}
-                  renderItem={(item) => (
-                    <List.Item>
-                      <List.Item.Meta
-                        avatar={<Avatar>{item.user[0]}</Avatar>}
-                        title={
-                          <div className="flex items-center justify-between">
-                            <span>
-                              <span className="font-medium">{item.user}</span>{' '}
-                              <span className="text-gray-500">{item.action}</span>
-                            </span>
-                            <span className="text-xs text-gray-400">{item.time}</span>
-                          </div>
-                        }
-                      />
-                    </List.Item>
-                  )}
-                />
-              </Card>
-
-              <Card className="shadow-sm rounded-2xl" title="Tiến độ dự án">
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span>Website Revamp</span>
-                      <span className="text-gray-500">72%</span>
-                    </div>
-                    <Progress percent={72} showInfo={false} />
+            <Card className="shadow-sm rounded-2xl" title="Tiến độ dự án">
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span>Website Revamp</span>
+                    <span className="text-gray-500">72%</span>
                   </div>
-                  <div>
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span>Mobile App</span>
-                      <span className="text-gray-500">43%</span>
-                    </div>
-                    <Progress percent={43} showInfo={false} />
-                  </div>
-                  <div>
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span>Data Pipeline</span>
-                      <span className="text-gray-500">90%</span>
-                    </div>
-                    <Progress percent={90} showInfo={false} />
-                  </div>
+                  <Progress percent={72} showInfo={false} />
                 </div>
-              </Card>
-            </div>
+                <div>
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span>Mobile App</span>
+                    <span className="text-gray-500">43%</span>
+                  </div>
+                  <Progress percent={43} showInfo={false} />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span>Data Pipeline</span>
+                    <span className="text-gray-500">90%</span>
+                  </div>
+                  <Progress percent={90} showInfo={false} />
+                </div>
+              </div>
+            </Card>
           </div>
-        </Content>
-
-        <Footer className="text-center text-gray-500">
-          © {new Date().getFullYear()} MH Solution — Antd v5 × Tailwind Dashboard
-        </Footer>
-      </Layout>
-    </Layout>
+        </div>
+      </Content>
+    </>
   )
 }
