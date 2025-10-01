@@ -3,9 +3,9 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import AdminLayout from '@/layouts/AdminLayout'
 import DefaultLayout from '@/layouts/DefaultLayout'
 
-import Home from '@/pages/Home'
-import AboutPage from '@/pages/AboutPage'
-import Dashboard from '@/pages/Dashboard'
+import Home from '@/pages/client/Home'
+import AboutPage from '@/pages/client/AboutPage'
+import Dashboard from '@/pages/admin/Dashboard'
 
 const AppRoutes = () => {
   return (
