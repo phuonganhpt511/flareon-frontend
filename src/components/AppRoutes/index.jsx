@@ -7,12 +7,13 @@ import Home from '@/pages/client/Home'
 import AboutPage from '@/pages/client/AboutPage'
 import Dashboard from '@/pages/admin/Dashboard'
 import CategoryPage from '@/pages/client/CategoryPage'
-import Header from '../Header' 
+import Header from '../Header'
+import CartPage from '@/pages/client/CartPage'
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
-      <Header /> 
+      <Header />
       <Routes>
         {/* Admin layout pages */}
         <Route path="/admin" element={<AdminLayout />}>
@@ -23,6 +24,7 @@ const AppRoutes = () => {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/category" element={<CategoryPage />} />
+          <Route path="/cart" element={<CartPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
