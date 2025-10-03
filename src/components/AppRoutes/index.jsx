@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router'
+import { BrowserRouter, Routes, Route } from 'react-router'
 
 import AdminLayout from '@/layouts/AdminLayout'
 import DefaultLayout from '@/layouts/DefaultLayout'
@@ -6,6 +6,7 @@ import DefaultLayout from '@/layouts/DefaultLayout'
 import Home from '@/pages/client/Home'
 import AboutPage from '@/pages/client/AboutPage'
 import Dashboard from '@/pages/admin/Dashboard'
+import CategoryPage from '@/pages/client/CategoryPage'
 import CartPage from '@/pages/client/CartPage'
 
 const AppRoutes = () => {
@@ -20,6 +21,7 @@ const AppRoutes = () => {
         <Route element={<DefaultLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/category" element={<CategoryPage />} />
           <Route path="/cart" element={<CartPage />} />
         </Route>
       </Routes>
