@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import AdminLayout from '@/layouts/AdminLayout'
 import DefaultLayout from '@/layouts/DefaultLayout'
@@ -12,7 +12,6 @@ import CartPage from '@/pages/client/CartPage'
 const AppRoutes = () => {
   return (
     <BrowserRouter>
-      <Header /> 
       <Routes>
         {/* Admin layout pages */}
         <Route path="/admin" element={<AdminLayout />}>
