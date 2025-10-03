@@ -7,6 +7,7 @@ import Home from '@/pages/client/Home'
 import AboutPage from '@/pages/client/AboutPage'
 import Dashboard from '@/pages/admin/Dashboard'
 import CartPage from '@/pages/client/CartPage'
+import RegisterPage from '@/pages/client/Register'
 
 const AppRoutes = () => {
   return (
@@ -16,6 +17,8 @@ const AppRoutes = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
         </Route>
+        {/* register*/}
+        <Route path="/register" element={<RegisterPage />} />
         {/* Default layout pages */}
         <Route element={<DefaultLayout />}>
           <Route path="/" element={<Home />} />

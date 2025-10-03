@@ -7,6 +7,7 @@ const Home = () => {
         consectetur aspernatur harum? Id, quibusdam magnam ut ullam illum sit alias eligendi
         exercitationem voluptatem aspernatur harum velit!
       </p>
+      <a href="http://localhost:5173/register">red</a>
     </>
   )
 }
