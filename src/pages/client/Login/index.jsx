@@ -24,11 +24,9 @@ const validationRules = {
 }
 
 const LoginPage = () => {
-  // const navigate = useNavigate(); // Dùng khi cần chuyển hướng
   const [loading, setLoading] = useState(false)
   const [submitError, setSubmitError] = useState(null)
 
-  // Khởi tạo React Hook Form
   const {
     handleSubmit,
     control,
@@ -40,29 +38,16 @@ const LoginPage = () => {
     },
   })
 
-  // Xử lý logic Đăng nhập (khi validation thành công)
   const onSubmit = async (data) => {
     setLoading(true)
     setSubmitError(null)
 
     // **LOGIC GỌI API ĐĂNG NHẬP (MOCK)**
     try {
-      // **NOTE:** Khi tích hợp API, thay thế khối này bằng:
-      // import http from '../../../apis/http';
-      // const response = await http.post('/auth/login', data);
-
-      // Giả lập kết quả thành công
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
       console.log('Đăng nhập thành công, dữ liệu:', data)
-
-      // Ví dụ: Lưu token vào localStorage và chuyển hướng
-      // localStorage.setItem('token', 'fake_auth_token_123');
-      // navigate('/');
-
-      // Hiển thị thông báo thành công (Có thể dùng Alert Antd hoặc Toast Notification)
     } catch (err) {
-      // Xử lý lỗi từ Server (Ví dụ: Sai email hoặc mật khẩu)
       const errorMessage = 'Đăng nhập thất bại. Vui lòng kiểm tra lại Email và Mật khẩu.'
       setSubmitError(errorMessage)
     } finally {
@@ -84,7 +69,6 @@ const LoginPage = () => {
         )}
 
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
-          {/* 1. Email */}
           <Form.Item
             label="Địa chỉ Email"
             validateStatus={errors.email ? 'error' : ''}
@@ -105,7 +89,6 @@ const LoginPage = () => {
             />
           </Form.Item>
 
-          {/* 2. Mật khẩu */}
           <Form.Item
             label="Mật khẩu"
             validateStatus={errors.password ? 'error' : ''}
