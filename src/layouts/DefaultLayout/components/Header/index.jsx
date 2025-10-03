@@ -1,4 +1,4 @@
-import { Search, Bell, ShoppingCart, Menu, ListOrdered } from "lucide-react"
+import { SearchOutlined } from '@ant-design/icons';
 
 const Header = () => {
   return (
@@ -16,7 +16,7 @@ const Header = () => {
         {/* Search bar (chỉ hiện trên md trở lên) */}
         <div className="flex-1 mx-4 hidden sm:block">
           <div className="flex items-center border border-orange-400 rounded-lg px-3 py-2">
-            <Search size={18} className="text-orange-500 mr-2" />
+            <SearchOutlined />
             <input
               type="text"
               placeholder="Search"
@@ -29,17 +29,17 @@ const Header = () => {
         <div className="flex items-center gap-4 text-orange-500">
           {/* Desktop: full icons */}
           <div className="hidden sm:flex items-center gap-5">
-            <ListOrdered size={22} className="cursor-pointer" />
+            {/* <ListOrdered size={22} className="cursor-pointer" />
             <Bell size={22} className="cursor-pointer" />
             <ShoppingCart size={22} className="cursor-pointer" />
-            <Menu size={24} className="cursor-pointer" />
+            <Menu size={24} className="cursor-pointer" /> */}
           </div>
 
           {/* Mobile: chỉ hiển thị 3 icon cơ bản */}
           <div className="flex sm:hidden items-center gap-4">
-            <Bell size={22} className="cursor-pointer" />
+            {/* <Bell size={22} className="cursor-pointer" />
             <ShoppingCart size={22} className="cursor-pointer" />
-            <Menu size={24} className="cursor-pointer" />
+            <Menu size={24} className="cursor-pointer" /> */}
           </div>
         </div>
       </div>
@@ -47,7 +47,7 @@ const Header = () => {
       {/* Search bar cho mobile */}
       <div className="px-3 pb-2 sm:hidden">
         <div className="flex items-center border border-orange-400 rounded-lg px-3 py-2">
-          <Search size={18} className="text-orange-500 mr-2" />
+          <SearchOutlined />
           <input
             type="text"
             placeholder="Search"
