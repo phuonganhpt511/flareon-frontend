@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import CartItem from './cartItem';
 
 const CartPage = () => {
     return (
         <div className="max-w-lg mx-auto bg-white min-h-screen flex flex-col">
-            {/* Cart Header */}
+            {/* Header */}
             <div className="flex items-center py-4 px-4">
                 <span className="text-orange-500 text-lg font-semibold mr-2">&lt; Giỏ hàng</span>
             </div>
@@ -22,8 +22,7 @@ const CartPage = () => {
                         Xác nhận
                     </button>
                 </div>
-            </div>
-
+            </div>          
         </div>
     );
 }
