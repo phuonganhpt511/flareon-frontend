@@ -8,6 +8,7 @@ import AboutPage from '@/pages/client/AboutPage'
 import Dashboard from '@/pages/admin/Dashboard'
 import CategoryPage from '@/pages/client/CategoryPage'
 import CartPage from '@/pages/client/CartPage'
+import OderPage from '@/pages/client/OderPage'
 
 const AppRoutes = () => {
   return (
@@ -23,6 +24,7 @@ const AppRoutes = () => {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/category" element={<CategoryPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/oder" element={<OderPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
