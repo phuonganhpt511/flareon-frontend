@@ -10,6 +10,9 @@ import CategoryPage from '@/pages/client/CategoryPage'
 import CartPage from '@/pages/client/CartPage'
 import FoodDetailPage from '@/pages/client/FoodDetailPage'
 import OderPage from '@/pages/client/OderPage'
+import RegisterPage from '@/pages/client/Register'
+import LoginPage from '@/pages/client/Login'
+import NoSignIn from '@/pages/client/No-sigin'
 
 const AppRoutes = () => {
   return (
@@ -19,9 +22,11 @@ const AppRoutes = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
         </Route>
+        {/* No-SignIn*/}
+        <Route path="/nosignin" element={<NoSignIn />} />
         {/* register*/}
         <Route path="/register" element={<RegisterPage />} />
-        {/* register*/}
+        {/* Login*/}
         <Route path="/login" element={<LoginPage />} />
         {/* Default layout pages */}
         <Route element={<DefaultLayout />}>

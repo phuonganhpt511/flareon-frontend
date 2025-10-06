@@ -7,44 +7,28 @@ const { Title, Text, Link } = Typography
 const FLAREON_LOGO = '/public/images/Logo.svg'
 const GL_Logo = '/public/images/google.png'
 
-const RegisterPage = () => {
+const NoSignIn = () => {
   return (
     <div className="flex flex-col items-center justify-start min-h-screen bg-white">
-      <header className="w-full flex justify-between items-center p-4">
-        <Link
-          href="/"
-          className="flex items-center !text-lg !text-orange-500 !hover:text-orange-500 font-bold "
-        >
-          <ArrowLeftOutlined className="mr-1" />
-          Quay lại
-        </Link>
-      </header>
-
       <div className="w-full max-w-lg px-4 mt-8">
         <div className="text-center mb-10">
           <img src={FLAREON_LOGO} className="mx-auto h-20 mb-6" />
           <Title level={4} className="!text-xl !font-semibold !text-orange-500">
-            Đăng ký
+            Tên Khách Hàng
           </Title>
         </div>
 
         <Form layout="vertical">
           <Form.Item>
             <Input
-              placeholder="Tên"
-              className="!rounded-lg !h-10 !text-sm placeholder:!text-orange-500 !border-orange-500"
+              placeholder="Vui lòng nhập tên"
+              className="!rounded-lg !h-10 !text-sm placeholder:!text-orange-500 !border-orange-500 "
             />
           </Form.Item>
           <Form.Item>
             <Input
-              placeholder="Email"
-              className="!rounded-lg !h-10 !text-sm placeholder:!text-orange-500 !border-orange-500"
-            />
-          </Form.Item>
-          <Form.Item>
-            <Input
-              type="password"
-              placeholder="Mật Khẩu"
+              type="number"
+              placeholder="Vui lòng nhập số điện thoại"
               className="!rounded-lg !h-10 !text-sm placeholder:!text-orange-500 !border-orange-500"
             />
           </Form.Item>
@@ -58,7 +42,7 @@ const RegisterPage = () => {
               size="large"
               className="!h-10 !rounded-lg !text-sm !font-bold !bg-orange-500 hover:!bg-orange-600 !border-none"
             >
-              Đăng Ký
+              Continue
             </Button>
           </Form.Item>
         </Form>
@@ -84,7 +68,7 @@ const RegisterPage = () => {
             block
             size="large"
             icon={<img src={GL_Logo} alt="Google" className="h-6 mr-2" />}
-            className="!h-10 !rounded-lg !text-sm !font-semibold !bg-gray-100 !border-none hover:!bg-gray-200"
+            className="!h-10 !rounded-sm !text-sm !font-semibold !bg-gray-100 !border-none hover:!bg-gray-200"
           >
             Continue with Google
           </Button>
@@ -111,4 +95,4 @@ const RegisterPage = () => {
   )
 }
 
-export default RegisterPage
+export default NoSignIn

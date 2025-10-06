@@ -7,22 +7,10 @@ const { Title, Text, Link } = Typography
 
 // Đường dẫn giả định đến Logo Flareon
 // Bạn cần thay thế bằng đường dẫn thực tế của logo trong dự án: '@/assets/flareon_logo.svg'
-const FLAREON_LOGO = '/public/images/Logo.svg'
+const FLAREON_LOGO = '/public/images/Logo.png'
 const GL_Logo = '/public/images/google.png'
 
 const LoginPage = () => {
-  // Chỉ sử dụng useState để quản lý trạng thái tĩnh và loading
-  const [loading, setLoading] = useState(false)
-  const [identifier, setIdentifier] = useState('') // State để giữ giá trị input
-
-  const handleSubmit = (e) => {
-    setLoading(true)
-    console.log('Tiếp tục với:', identifier)
-    setTimeout(() => {
-      setLoading(false)
-    }, 1000)
-  }
-
   return (
     <div className="flex flex-col items-center justify-start min-h-screen bg-white">
       <header className="w-full flex justify-between items-center p-4">
@@ -35,19 +23,26 @@ const LoginPage = () => {
         </Link>
       </header>
 
-      <div className="w-full max-w-sm px-4 mt-8">
+      <div className="w-full max-w-lg px-4 mt-8">
         <div className="text-center mb-10">
           <img src={FLAREON_LOGO} className="mx-auto h-20 mb-6" />
           <Title level={4} className="!text-xl !font-semibold !text-orange-500">
-            Tên khách hàng
+            Đăng nhập
           </Title>
         </div>
 
-        <Form layout="vertical" onFinish={handleSubmit}>
+        <Form layout="vertical">
           <Form.Item>
             <Input
-              placeholder="Vui lòng nhập tên..."
-              className="!rounded-lg !h-14 !text-lg placeholder:!text-orange-500 !border-orange-500"
+              placeholder="Email"
+              className="!rounded-lg !h-10 !text-sm placeholder:!text-orange-500 !border-orange-500"
+            />
+          </Form.Item>
+          <Form.Item>
+            <Input
+              type="password"
+              placeholder="Mật khẩu"
+              className="!rounded-lg !h-10 !text-sm placeholder:!text-orange-500 !border-orange-500"
             />
           </Form.Item>
 
@@ -58,8 +53,7 @@ const LoginPage = () => {
               htmlType="submit"
               block
               size="large"
-              loading={loading}
-              className="!h-14 !rounded-lg !text-xl !font-bold !bg-orange-500 hover:!bg-orange-600 !border-none"
+              className="!h-10 !rounded-lg !text-sm !font-bold !bg-orange-500 hover:!bg-orange-600 !border-none"
             >
               Continue
             </Button>
@@ -77,9 +71,9 @@ const LoginPage = () => {
           <Button
             block
             size="large"
-            className="!h-14 !rounded-lg !text-lg !font-semibold !bg-gray-100 !border-none hover:!bg-gray-200"
+            className="!h-10 !rounded-lg !text-sm !font-semibold !bg-gray-100 !border-none hover:!bg-gray-200"
           >
-            Sign in
+            Sign up
           </Button>
 
           {/* Continue with Google */}
@@ -87,7 +81,7 @@ const LoginPage = () => {
             block
             size="large"
             icon={<img src={GL_Logo} alt="Google" className="h-6 mr-2" />}
-            className="!h-14 !rounded-lg !text-lg !font-semibold !bg-gray-100 !border-none hover:!bg-gray-200"
+            className="!h-10 !rounded-lg !text-sm !font-semibold !bg-gray-100 !border-none hover:!bg-gray-200"
           >
             Continue with Google
           </Button>
@@ -104,7 +98,6 @@ const LoginPage = () => {
             and
             <br />
             <Link href="/privacy" className="!font-bold !text-gray-800 hover:!text-orange-500">
-              {' '}
               Privacy Policy
             </Link>
           </Text>
