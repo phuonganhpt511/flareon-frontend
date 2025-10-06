@@ -1,5 +1,5 @@
 import AppRoutes from '@components/AppRoutes'
-import './styles/tailwind.css'
+import '@shared/styles/tailwind.css'
 
 function App() {
   return <AppRoutes />
