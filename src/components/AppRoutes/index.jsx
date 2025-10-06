@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router'
+import { BrowserRouter, Routes, Route } from 'react-router'
 
 import AdminLayout from '@/layouts/AdminLayout'
 import DefaultLayout from '@/layouts/DefaultLayout'
@@ -6,9 +6,10 @@ import DefaultLayout from '@/layouts/DefaultLayout'
 import Home from '@/pages/client/Home'
 import AboutPage from '@/pages/client/AboutPage'
 import Dashboard from '@/pages/admin/Dashboard'
+import CategoryPage from '@/pages/client/CategoryPage'
 import CartPage from '@/pages/client/CartPage'
-import RegisterPage from '@/pages/client/Register'
-import LoginPage from '@/pages/client/Login'
+import FoodDetailPage from '@/pages/client/FoodDetailPage'
+import OderPage from '@/pages/client/OderPage'
 
 const AppRoutes = () => {
   return (
@@ -26,7 +27,10 @@ const AppRoutes = () => {
         <Route element={<DefaultLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/category" element={<CategoryPage />} />
+          <Route path="/product/:id" element={<FoodDetailPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/oder" element={<OderPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
