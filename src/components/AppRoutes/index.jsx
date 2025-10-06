@@ -8,6 +8,7 @@ import AboutPage from '@/pages/client/AboutPage'
 import Dashboard from '@/pages/admin/Dashboard'
 import CategoryPage from '@/pages/client/CategoryPage'
 import CartPage from '@/pages/client/CartPage'
+import FoodDetailPage from '@/pages/client/FoodDetailPage';
 import OderPage from '@/pages/client/OderPage'
 
 const AppRoutes = () => {
@@ -23,6 +24,7 @@ const AppRoutes = () => {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/category" element={<CategoryPage />} />
+           <Route path="/product/:id" element={<FoodDetailPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/oder" element={<OderPage />} />
         </Route>
