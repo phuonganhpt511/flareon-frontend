@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import CartItem from './cartItem';
 
 const CartPage = () => {
