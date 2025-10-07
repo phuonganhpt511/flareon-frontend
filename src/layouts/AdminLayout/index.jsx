@@ -1,10 +1,10 @@
+import { useState } from 'react'
 import { Outlet } from 'react-router'
 import { Layout } from 'antd'
-
+// components
 import { Sidebar } from './components/Sidebar'
 import HeaderAdmin from './components/HeaderAdmin'
 import FooterAdmin from './components/FooterAdmin'
-import { useState } from 'react'
 
 const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false)

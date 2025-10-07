@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router'
 
 import AdminLayout from '@/layouts/AdminLayout'
 import DefaultLayout from '@/layouts/DefaultLayout'
-
+// Client pages
 import Home from '@/pages/client/Home'
 import AboutPage from '@/pages/client/AboutPage'
 import Dashboard from '@/pages/admin/Dashboard'
@@ -10,6 +10,15 @@ import CategoryPage from '@/pages/client/CategoryPage'
 import CartPage from '@/pages/client/CartPage'
 import FoodDetailPage from '@/pages/client/FoodDetailPage'
 import OrderPage from '@/pages/client/OrderPage'
+// Admin pages
+import CategoryManagement from '@/pages/admin/CategoryManagement'
+import DishManagement from '@/pages/admin/DishManagement'
+import TableManagement from '@/pages/admin/TableManagement'
+import OrderManagement from '@/pages/admin/OrderManagement'
+import PaymentAndBill from '@/pages/admin/PaymentAndBill'
+import ReviewManagement from '@/pages/admin/ReviewManagement'
+import StaffManagement from '@/pages/admin/StaffManagement'
+import UserManagement from '@/pages/admin/UserManagement'
 
 const AppRoutes = () => {
   return (
@@ -18,6 +27,14 @@ const AppRoutes = () => {
         {/* Admin layout pages */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
+          <Route path="categories" element={<CategoryManagement />} />
+          <Route path="dishes" element={<DishManagement />} />
+          <Route path="tables" element={<TableManagement />} />
+          <Route path="orders" element={<OrderManagement />} />
+          <Route path="payment-and-billing" element={<PaymentAndBill />} />
+          <Route path="reviews" element={<ReviewManagement />} />
+          <Route path="staffs" element={<StaffManagement />} />
+          <Route path="users" element={<UserManagement />} />
         </Route>
         {/* Default layout pages */}
         <Route element={<DefaultLayout />}>
