@@ -116,110 +116,108 @@ export default function Dashboard() {
 
   return (
     <>
-      <section className='px-4 md:px-6 md:pt-6'>
+      <section className="mb-3">
         <h1 className="font-bold text-3xl mb-2">Trang tổng quan</h1>
-        <Breadcrumb items={[{ title: 'Trang chủ' }, { title: 'Tổng quan' }]} />
+        <Breadcrumb items={[{ title: 'Trang chủ' }, { title: 'Trang tổng quan' }]} />
       </section>
 
-      <Content className="p-4 md:p-6">
-        {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
-          <Card className="shadow-sm rounded-2xl">
-            <div className="flex items-start justify-between">
-              <Statistic title="Tổng doanh thu" value={k(revenue)} />
-              <div className="w-24">
-                <Sparkline values={revenueData.map((d) => d.revenue)} />
-              </div>
+      {/* KPIs */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
+        <Card className="shadow-sm rounded-2xl">
+          <div className="flex items-start justify-between">
+            <Statistic title="Tổng doanh thu" value={k(revenue)} />
+            <div className="w-24">
+              <Sparkline values={revenueData.map((d) => d.revenue)} />
             </div>
-            <div className="mt-2 text-sm text-gray-500">6 tháng gần nhất</div>
-          </Card>
+          </div>
+          <div className="mt-2 text-sm text-gray-500">6 tháng gần nhất</div>
+        </Card>
 
-          <Card className="shadow-sm rounded-2xl">
-            <div className="flex items-start justify-between">
-              <Statistic title="Tăng trưởng trung bình" value={growth.toFixed(1)} suffix="%" />
-              <div className="w-24">
-                <Sparkline values={revenueData.map((d) => d.growth)} />
-              </div>
+        <Card className="shadow-sm rounded-2xl">
+          <div className="flex items-start justify-between">
+            <Statistic title="Tăng trưởng trung bình" value={growth.toFixed(1)} suffix="%" />
+            <div className="w-24">
+              <Sparkline values={revenueData.map((d) => d.growth)} />
             </div>
-            <div className="mt-2 text-sm text-gray-500">MoM</div>
-          </Card>
+          </div>
+          <div className="mt-2 text-sm text-gray-500">MoM</div>
+        </Card>
 
-          <Card className="shadow-sm rounded-2xl">
-            <Statistic title="Tỷ lệ hoàn thành KPI" value={86} suffix="%" />
-            <div className="mt-4">
-              <Progress percent={86} showInfo={false} />
-            </div>
-          </Card>
+        <Card className="shadow-sm rounded-2xl">
+          <Statistic title="Tỷ lệ hoàn thành KPI" value={86} suffix="%" />
+          <div className="mt-4">
+            <Progress percent={86} showInfo={false} />
+          </div>
+        </Card>
 
-          <Card className="shadow-sm rounded-2xl">
-            <Statistic title="Khách hàng mới" value={324} />
-            <div className="mt-2 text-sm text-gray-500">trong 30 ngày</div>
-          </Card>
-        </div>
+        <Card className="shadow-sm rounded-2xl">
+          <Statistic title="Khách hàng mới" value={324} />
+          <div className="mt-2 text-sm text-gray-500">trong 30 ngày</div>
+        </Card>
+      </div>
 
-        {/* Content grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          <Card className="shadow-sm rounded-2xl xl:col-span-2" title="Đơn hàng gần đây">
-            <Table
-              columns={columns}
-              dataSource={orders}
-              pagination={{ pageSize: 5 }}
-              className="rounded-xl"
+      {/* Content grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <Card className="shadow-sm rounded-2xl xl:col-span-2" title="Đơn hàng gần đây">
+          <Table
+            columns={columns}
+            dataSource={orders}
+            pagination={{ pageSize: 5 }}
+            className="rounded-xl"
+          />
+        </Card>
+
+        <div className="flex flex-col gap-4">
+          <Card className="shadow-sm rounded-2xl" title="Hoạt động gần đây">
+            <List
+              itemLayout="horizontal"
+              dataSource={activities}
+              renderItem={(item) => (
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={<Avatar>{item.user[0]}</Avatar>}
+                    title={
+                      <div className="flex items-center justify-between">
+                        <span>
+                          <span className="font-medium">{item.user}</span>{' '}
+                          <span className="text-gray-500">{item.action}</span>
+                        </span>
+                        <span className="text-xs text-gray-400">{item.time}</span>
+                      </div>
+                    }
+                  />
+                </List.Item>
+              )}
             />
           </Card>
 
-          <div className="flex flex-col gap-4">
-            <Card className="shadow-sm rounded-2xl" title="Hoạt động gần đây">
-              <List
-                itemLayout="horizontal"
-                dataSource={activities}
-                renderItem={(item) => (
-                  <List.Item>
-                    <List.Item.Meta
-                      avatar={<Avatar>{item.user[0]}</Avatar>}
-                      title={
-                        <div className="flex items-center justify-between">
-                          <span>
-                            <span className="font-medium">{item.user}</span>{' '}
-                            <span className="text-gray-500">{item.action}</span>
-                          </span>
-                          <span className="text-xs text-gray-400">{item.time}</span>
-                        </div>
-                      }
-                    />
-                  </List.Item>
-                )}
-              />
-            </Card>
-
-            <Card className="shadow-sm rounded-2xl" title="Tiến độ dự án">
-              <div className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between text-sm mb-1">
-                    <span>Website Revamp</span>
-                    <span className="text-gray-500">72%</span>
-                  </div>
-                  <Progress percent={72} showInfo={false} />
+          <Card className="shadow-sm rounded-2xl" title="Tiến độ dự án">
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between text-sm mb-1">
+                  <span>Website Revamp</span>
+                  <span className="text-gray-500">72%</span>
                 </div>
-                <div>
-                  <div className="flex items-center justify-between text-sm mb-1">
-                    <span>Mobile App</span>
-                    <span className="text-gray-500">43%</span>
-                  </div>
-                  <Progress percent={43} showInfo={false} />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between text-sm mb-1">
-                    <span>Data Pipeline</span>
-                    <span className="text-gray-500">90%</span>
-                  </div>
-                  <Progress percent={90} showInfo={false} />
-                </div>
+                <Progress percent={72} showInfo={false} />
               </div>
-            </Card>
-          </div>
+              <div>
+                <div className="flex items-center justify-between text-sm mb-1">
+                  <span>Mobile App</span>
+                  <span className="text-gray-500">43%</span>
+                </div>
+                <Progress percent={43} showInfo={false} />
+              </div>
+              <div>
+                <div className="flex items-center justify-between text-sm mb-1">
+                  <span>Data Pipeline</span>
+                  <span className="text-gray-500">90%</span>
+                </div>
+                <Progress percent={90} showInfo={false} />
+              </div>
+            </div>
+          </Card>
         </div>
-      </Content>
+      </div>
     </>
   )
 }
