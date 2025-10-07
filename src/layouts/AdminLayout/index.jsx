@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Outlet } from 'react-router'
 import { Layout } from 'antd'
+const { Content } = Layout
 // components
 import { Sidebar } from './components/Sidebar'
 import HeaderAdmin from './components/HeaderAdmin'
@@ -16,7 +17,9 @@ const AdminLayout = () => {
         <Sidebar role={role} collapsed={collapsed} onCollapse={setCollapsed} />
         <Layout>
           <HeaderAdmin />
-          <Outlet />
+          <Content className="p-4 md:p-6">
+            <Outlet />
+          </Content>
           <FooterAdmin />
         </Layout>
       </Layout>
