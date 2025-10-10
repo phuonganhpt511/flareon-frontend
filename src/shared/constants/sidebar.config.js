@@ -15,7 +15,7 @@ export const BRAND = { name: 'Flareon Dashboard', icon: Flame }
 
 export const MENU = [
   { key: 'dashboard', label: 'Thống kê', path: '/admin', icon: LayoutDashboard },
-  { key: 'catalog', label: 'Danh mục', path: '/admin/categories', icon: ChartBarStacked },
+  { key: 'categories', label: 'Danh mục', path: '/admin/categories', icon: ChartBarStacked },
   { key: 'dishes', label: 'Món ăn', path: '/admin/dishes', icon: Soup },
   { key: 'tables', label: 'Bàn ăn', path: '/admin/tables', icon: Table },
   {
