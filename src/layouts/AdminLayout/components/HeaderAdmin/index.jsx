@@ -19,7 +19,7 @@ const HeaderAdmin = () => {
     <Header className="!bg-white px-4">
       <div className="flex justify-end">
         <div className="flex items-center gap-2">
-          <div className="hidden md:flex items-center px-3 py-1.5 rounded-xl bg-gray-50 border">
+          <div className="hidden md:flex items-center px-3 py-1.5 rounded-xl bg-gray-50">
             <SearchOutlined className="mr-2" />
             <Input bordered={false} placeholder="Tìm kiếm..." className="w-56" />
           </div>
