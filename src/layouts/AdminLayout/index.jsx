@@ -13,7 +13,7 @@ const AdminLayout = () => {
 
   return (
     <>
-      <Layout className="min-h-screen bg-white">
+      <Layout className="h-screen">
         <Sidebar role={role} collapsed={collapsed} onCollapse={setCollapsed} />
         <Layout>
           <HeaderAdmin />
