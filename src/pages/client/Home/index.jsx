@@ -1,12 +1,16 @@
+
+import CategoryList from "@/components/CategoryList"
+import ProductList from "@/components/ProductList"
+import BannerSlider from "@/components/Slider"
+
+
 const Home = () => {
   return (
     <>
-      <h1 className="text-4xl font-bold bg-amber-400">Home Page</h1>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum quae corporis fuga aperiam
-        consectetur aspernatur harum? Id, quibusdam magnam ut ullam illum sit alias eligendi
-        exercitationem voluptatem aspernatur harum velit!
-      </p>
+      <BannerSlider />
+      <CategoryList />
+      <ProductList title="Sản phẩm nổi bật" />
+      <ProductList title="Hàng mới về" />
     </>
   )
 }

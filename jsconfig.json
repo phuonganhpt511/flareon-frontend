@@ -8,5 +8,6 @@
       "@layouts/*": ["src/layouts/*"],
       "@hooks/*": ["src/hooks/*"]
     }
-  }
+  },
+  "include": ["src"]
 }
