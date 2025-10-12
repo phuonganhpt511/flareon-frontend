@@ -1,7 +1,5 @@
 import React from 'react'
 import { Card, Table, Tag, Breadcrumb } from 'antd'
-import { PlusCircleOutlined } from '@ant-design/icons'
-import AntButton from '@/components/AntButton'
 
 const columns = [
   {
@@ -68,12 +66,6 @@ const DishManagement = () => {
       <section className="mb-3">
         <h1 className="font-bold text-3xl mb-2">Quản lý món ăn</h1>
         <Breadcrumb items={[{ title: 'Trang chủ' }, { title: 'Quản lý món ăn' }]} />
-      </section>
-
-      <section className="flex justify-end mb-5">
-        <AntButton type="primary" icon={<PlusCircleOutlined />}>
-          Thêm mới
-        </AntButton>
       </section>
 
       <Card className="shadow-sm rounded-2xl xl:col-span-2" title="Đơn hàng gần đây">
