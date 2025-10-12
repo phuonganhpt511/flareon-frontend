@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import { Card, Breadcrumb } from 'antd'
+import { Card, Breadcrumb, Input } from 'antd'
 import { PlusCircleOutlined } from '@ant-design/icons'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -110,7 +110,8 @@ const CategoryManagement = () => {
         <Breadcrumb items={[{ title: 'Trang chủ' }, { title: 'Quản lý danh mục' }]} />
       </section>
 
-      <section className="flex justify-end mb-5">
+      <section className="flex justify-between mb-3">
+        <Input.Search placeholder="Tìm kiếm danh mục" allowClear style={{ maxWidth: 300 }} />
         <AntButton type="primary" icon={<PlusCircleOutlined />} onClick={openCreate}>
           Thêm mới
         </AntButton>
