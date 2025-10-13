@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Card, Table, Tag, Breadcrumb, Space, Button, Select, Input, message } from 'antd'
+import { Card, Table, Tag, Breadcrumb, Space, Button, Select, Input, message, Modal } from 'antd'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import http from '@/apis/http'
 import {
@@ -15,50 +15,70 @@ import OrderModalEdit from './modalEdit'
 import OrderModalDetail from './orderDetail'
 
 const { Option } = Select
+const { confirm } = Modal
 
 const OrderManagement = () => {
   const [statusSelected, setStatusSelected] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
   const [modalDetailOpen, setModalDetailOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState(null)
-  // const [searchtext, setSearchtext] = useState('')
+  const [searchText, setSearchtext] = useState('')
 
   const queryClient = useQueryClient()
   const { data, isLoading, error } = useQuery({
-    queryKey: ['orders', statusSelected],
+    queryKey: ['orders', statusSelected, searchText],
     queryFn: async () => {
-      if (!statusSelected) {
-        const res = await http.get('/orders')
-        return res.data
-      } else {
-        const res = await http.get(`/orders?status=${statusSelected}`)
-        return res.data
+      let url = '/orders'
+
+      const params = []
+      if (statusSelected) params.push(`status=${statusSelected}`)
+      if (searchText) params.push(`search=${searchText}`)
+
+      if (params.length > 0) {
+        url += `?${params.join('&')}`
       }
+
+      const res = await http.get(url)
+      return res.data
     },
     enabled: true,
   })
-  const { mutate } = useMutation({
+  const { mutate: updateOrder } = useMutation({
     mutationFn: async ({ id, data }) => {
       return await http.patch(`/orders/${id}`, data)
     },
     onSuccess: () => {
       message.success('Cập nhật đơn hàng thành công!')
-      queryClient.invalidateQueries(['orders']) // làm mới danh sách orders
+      queryClient.invalidateQueries(['orders'])
     },
     onError: () => {
       message.error('Cập nhật thất bại!')
     },
   })
-  // const handleSearch = (value) => {
-  //   setSearchtext(value)
-  // }
+
+  const { mutate: deleteOrder } = useMutation({
+    mutationFn: async (id) => {
+      return await http.delete(`/orders/${id}`)
+    },
+    onSuccess: () => {
+      message.success('Xóa đơn hàng thành công!')
+      queryClient.invalidateQueries(['orders'])
+    },
+    onError: () => {
+      message.error('Xóa thất bại!')
+    },
+  })
+
+  const handleSearch = (value) => {
+    setSearchtext(value)
+  }
 
   const handleChange = (value) => {
     setStatusSelected(value)
   }
 
   const handleUpdate = (value, orderId) => {
-    mutate({ id: orderId, data: value })
+    updateOrder({ id: orderId, data: value })
     setModalOpen(false)
   }
 
@@ -88,12 +108,12 @@ const OrderManagement = () => {
     {
       title: 'Bàn',
       key: 'table_name',
-      render: (record) => record.table_id?.table_name || 'Chưa có bàn',
+      render: (record) => record.table?.table_name || 'Chưa có bàn',
     },
     {
       title: 'Khách hàng',
       key: 'username',
-      render: (record) => record.user_id?.username || 'Khách lẻ',
+      render: (record) => record.user?.username || 'Khách lẻ',
     },
     {
       title: 'Trạng thái',
@@ -103,7 +123,7 @@ const OrderManagement = () => {
         const colorMap = {
           Pending: 'gold',
           Processing: 'blue',
-          Complete: 'green',
+          Completed: 'green',
           Cancelled: 'red',
         }
         return <Tag color={colorMap[status] || 'default'}>{status}</Tag>
@@ -119,7 +139,11 @@ const OrderManagement = () => {
               type="primary"
               danger
               icon={<DeleteOutlined />}
-              onClick={() => console.log(record)}
+              onClick={() => {
+                if (window.confirm('Xác nhận xóa ?')) {
+                  deleteOrder(record._id)
+                }
+              }}
             />
           )
         }
@@ -163,13 +187,12 @@ const OrderManagement = () => {
             }}
           >
             <Space>
-              <Input
+              <Input.Search
                 placeholder="Tìm kiếm theo bàn hoặc khách hàng..."
                 prefix={<SearchOutlined />}
                 style={{ width: 260 }}
-                // onChange={(e) => handleSearch(e.target.value)}
+                onSearch={handleSearch}
               />
-              <Button type="primary">Search</Button>
             </Space>
             <Space>
               <Select
@@ -183,6 +206,7 @@ const OrderManagement = () => {
                 <Option value="Pending">Pending</Option>
                 <Option value="Processing">Processing</Option>
                 <Option value="Shipped">Shipped</Option>
+                <Option value="Completed">Completed</Option>
                 <Option value="Cancelled">Cancelled</Option>
               </Select>
             </Space>

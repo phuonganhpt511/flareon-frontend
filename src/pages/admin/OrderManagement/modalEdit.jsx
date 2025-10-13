@@ -41,6 +41,7 @@ const OrderModalEdit = ({ open, order, onCancel, onSubmit }) => {
               { value: 'Pending', label: 'Pending' },
               { value: 'Processing', label: 'Processing' },
               { value: 'Shipped', label: 'Shipped' },
+              { value: 'Completed', label: 'Completed' },
               { value: 'Cancelled', label: 'Cancelled' },
             ]}
           />
