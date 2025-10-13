@@ -10,6 +10,8 @@ import CategoryPage from '@/pages/client/CategoryPage'
 import CartPage from '@/pages/client/CartPage'
 import FoodDetailPage from '@/pages/client/FoodDetailPage'
 import OrderPage from '@/pages/client/OrderPage'
+import Login from '@/pages/client/Login'
+import Register from '@/pages/client/Register'
 // Admin pages
 import CategoryManagement from '@/pages/admin/CategoryManagement'
 import DishManagement from '@/pages/admin/DishManagement'
@@ -44,6 +46,8 @@ const AppRoutes = () => {
           <Route path="/product/:id" element={<FoodDetailPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/order" element={<OrderPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Route>
       </Routes>
     </BrowserRouter>
