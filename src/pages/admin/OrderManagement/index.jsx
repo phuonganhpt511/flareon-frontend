@@ -23,6 +23,21 @@ const OrderManagement = () => {
   const [modalDetailOpen, setModalDetailOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [searchText, setSearchtext] = useState('')
+  const [messageApi, contextHolder] = message.useMessage()
+
+  const deleteSuccess = () => {
+    messageApi.open({
+      type: 'success',
+      content: 'Delete Success',
+    })
+  }
+
+  const deleteError = () => {
+    messageApi.open({
+      type: 'error',
+      content: 'Delete Success',
+    })
+  }
 
   const queryClient = useQueryClient()
   const { data, isLoading, error } = useQuery({
@@ -61,11 +76,11 @@ const OrderManagement = () => {
       return await http.delete(`/orders/${id}`)
     },
     onSuccess: () => {
-      message.success('Xóa đơn hàng thành công!')
+      deleteSuccess()
       queryClient.invalidateQueries(['orders'])
     },
     onError: () => {
-      message.error('Xóa thất bại!')
+      deleteError()
     },
   })
 
@@ -169,6 +184,7 @@ const OrderManagement = () => {
   if (error) return <p>Error: {error.message}</p>
   return (
     <>
+      {contextHolder}
       <section className="mb-3">
         <h1 className="font-bold text-3xl mb-2">Quản lý đơn hàng</h1>
         <Breadcrumb items={[{ title: 'Trang chủ' }, { title: 'Quản lý đơn hàng' }]} />
