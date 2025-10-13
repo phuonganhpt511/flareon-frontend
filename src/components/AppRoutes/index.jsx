@@ -19,6 +19,8 @@ import PaymentAndBill from '@/pages/admin/PaymentAndBill'
 import ReviewManagement from '@/pages/admin/ReviewManagement'
 import StaffManagement from '@/pages/admin/StaffManagement'
 import UserManagement from '@/pages/admin/UserManagement'
+import CreateDish from '@/pages/admin/DishManagement/createDish'
+import UpdateDish from '@/pages/admin/DishManagement/updateDish'
 
 const AppRoutes = () => {
   return (
@@ -28,7 +30,11 @@ const AppRoutes = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="categories" element={<CategoryManagement />} />
+          
           <Route path="dishes" element={<DishManagement />} />
+          <Route path="dishes/create" element={<CreateDish />} />
+          <Route path="dishes/update/:id" element={<UpdateDish />} />
+
           <Route path="tables" element={<TableManagement />} />
           <Route path="orders" element={<OrderManagement />} />
           <Route path="payment-and-billing" element={<PaymentAndBill />} />

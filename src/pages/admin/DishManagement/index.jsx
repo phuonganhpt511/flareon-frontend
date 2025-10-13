@@ -1,66 +1,102 @@
-import React from 'react'
-import { Card, Table, Tag, Breadcrumb } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { Card, Table, Tag, Breadcrumb, Button, Space, Popconfirm, message } from 'antd'
+import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import { Link } from 'react-router-dom'
+import axios from 'axios'
 
-const columns = [
+const columns = (onDelete) => [
   {
-    title: 'Mã đơn',
-    dataIndex: 'orderId',
-    key: 'orderId',
+    title: 'ID',
+    dataIndex: 'dish_id',
+    key: 'dish_id',
     render: (v) => <span className="font-medium">{v}</span>,
   },
   {
-    title: 'Khách hàng',
-    dataIndex: 'customer',
-    key: 'customer',
+    title: 'Tên món',
+    dataIndex: 'dish_name',
+    key: 'dish_name',
+  },
+  {
+    title: 'Mô tả',
+    dataIndex: 'description',
+    key: 'description',
+    render: (v) => <span className="truncate block max-w-xs">{v}</span>,
+  },
+  {
+    title: 'Danh mục',
+    dataIndex: 'category_name',
+    key: 'category_name',
+  },
+  {
+    title: 'Giá',
+    dataIndex: 'price',
+    key: 'price',
+    render: (v) => <span>{v?.toLocaleString()}đ</span>,
   },
   {
     title: 'Trạng thái',
     dataIndex: 'status',
     key: 'status',
-    render: (status) => {
-      const map = {
-        Shipped: 'green',
-        Processing: 'blue',
-        Pending: 'gold',
-        Cancelled: 'red',
-      }
-      return <Tag color={map[status] || 'default'}>{status}</Tag>
-    },
-  },
-]
-
-const orders = [
-  {
-    key: 'a1',
-    orderId: '#INV-1042',
-    customer: 'Nguyen Van A',
-    status: 'Shipped',
-    total: 2450000,
+    render: (status) => (
+      <Tag color={status === 'available' ? 'green' : 'red'}>
+        {status === 'available' ? 'Còn hàng' : 'Hết hàng'}
+      </Tag>
+    ),
   },
   {
-    key: 'a2',
-    orderId: '#INV-1043',
-    customer: 'Tran Thi B',
-    status: 'Pending',
-    total: 990000,
+    title: 'Ảnh',
+    dataIndex: 'image_url',
+    key: 'image_url',
+    render: (url) => (
+      <img src={url} alt="dish" className="w-16 h-16 object-cover rounded" />
+    ),
   },
   {
-    key: 'a3',
-    orderId: '#INV-1044',
-    customer: 'Le Van C',
-    status: 'Cancelled',
-    total: 0,
-  },
-  {
-    key: 'a5',
-    orderId: '#INV-1045',
-    customer: 'Pham D',
-    status: 'Processing',
-    total: 1200000,
+    title: 'Thao tác',
+    key: 'action',
+    render: (_, record) => (
+      <Space>
+        <Link to={`/admin/dishes/update/${record.dish_id}`}>
+          <Button type="primary" size="small" icon={<EditOutlined />}>
+            Sửa
+          </Button>
+        </Link>
+        <Popconfirm
+          title="Bạn có chắc muốn xóa món này?"
+          onConfirm={() => onDelete(record.dish_id)}
+          okText="Xóa"
+          cancelText="Hủy"
+        >
+          <Button type="default" danger size="small" icon={<DeleteOutlined />}>
+            Xóa
+          </Button>
+        </Popconfirm>
+      </Space>
+    ),
   },
 ]
 
 const DishManagement = () => {
+  const [data, setData] = useState([])
+
+  useEffect(() => {
+    axios.get('http://localhost:8080/api/dishes')
+      .then(res => {
+        // Nếu backend trả về { success, data }
+        setData(res.data.data || res.data)
+      })
+      .catch(() => setData([]))
+  }, [])
+
+  const handleDelete = (id) => {
+    axios.delete(`http://localhost:8080/api/dishes/${id}`)
+      .then(() => {
+        setData(data => data.filter(item => item.dish_id !== id))
+        message.success('Đã xóa món ăn thành công!')
+      })
+      .catch(() => message.error('Xóa món ăn thất bại!'))
+  }
+
   return (
     <>
       <section className="mb-3">
@@ -68,12 +104,25 @@ const DishManagement = () => {
         <Breadcrumb items={[{ title: 'Trang chủ' }, { title: 'Quản lý món ăn' }]} />
       </section>
 
-      <Card className="shadow-sm rounded-2xl xl:col-span-2" title="Đơn hàng gần đây">
+      <Card
+        className="shadow-sm rounded-2xl xl:col-span-2"
+        title={
+          <div className="flex justify-between items-center">
+            <span>Danh sách món ăn</span>
+            <Link to="/admin/dishes/create">
+              <Button type="primary" icon={<PlusOutlined />}>
+                Thêm món ăn
+              </Button>
+            </Link>
+          </div>
+        }
+      >
         <Table
-          columns={columns}
-          dataSource={orders}
+          columns={columns(handleDelete)}
+          dataSource={data}
           pagination={{ pageSize: 5 }}
           className="rounded-xl"
+          rowKey="dish_id"
         />
       </Card>
     </>
