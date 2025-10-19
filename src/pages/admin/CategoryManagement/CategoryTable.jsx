@@ -5,7 +5,7 @@ import AntButton from '@/components/AntButton'
 
 import { STATUS_MAP } from '@/shared/constants/category'
 
-const CategoryTable = ({ data, loading, onEdit, onRemove }) => {
+const CategoryTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
   const columns = useMemo(
     () => [
       {
@@ -44,14 +44,19 @@ const CategoryTable = ({ data, loading, onEdit, onRemove }) => {
         align: 'center',
         render: (_, record) => (
           <div className="flex items-center gap-2">
-            <AntButton icon={<EditOutlined />} onClick={() => onEdit(record)} />
+            <AntButton title="Chỉnh sửa" icon={<EditOutlined />} onClick={() => onEdit(record)} />
             <Popconfirm
               title="Bạn có chắc chắn muốn xoá danh mục này?"
               onConfirm={() => onRemove(record._id)}
               okText="Có"
               cancelText="Không"
             >
-              <AntButton icon={<DeleteOutlined />} danger />
+              <AntButton
+                title="Xoá"
+                icon={<DeleteOutlined />}
+                danger
+                loading={deletingId === record._id}
+              />
             </Popconfirm>
           </div>
         ),

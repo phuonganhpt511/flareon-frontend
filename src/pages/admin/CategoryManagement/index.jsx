@@ -5,7 +5,6 @@ import { PlusCircleOutlined } from '@ant-design/icons'
 import AntButton from '@/components/AntButton'
 import categoryAPI from '@/apis/category/category.api'
 import CategoryTable from './CategoryTable'
-import { DEFAULT_FORM_VALUES } from '@/shared/constants/category'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import CategoryFormModal from './CategoryFormModal'
 
@@ -20,6 +19,7 @@ const CategoryManagement = () => {
   const queryClient = useQueryClient()
   const [isOpenModal, setIsOpenModal] = useState(false)
   const [editingRow, setEditingRow] = useState(null)
+  const [deletingId, setDeletingId] = useState(null)
 
   // GET LIST
   const { data: categories = [], isLoading } = useQuery({
@@ -29,7 +29,7 @@ const CategoryManagement = () => {
       return res.data || []
     },
     staleTime: 60000,
-    refreshOnWindowFocus: false,
+    refetchOnWindowFocus: false,
     onError: () => toast.error('Không thể tải danh mục, vui lòng thử lại!'),
   })
 
@@ -74,6 +74,7 @@ const CategoryManagement = () => {
       toast.success('Xoá danh mục thành công!')
     },
     onSettled: () => {
+      setDeletingId(null)
       queryClient.invalidateQueries({ queryKey: categoryKeys.list() })
     },
   })
@@ -150,6 +151,7 @@ const CategoryManagement = () => {
           loading={isLoading}
           onEdit={openEdit}
           onRemove={handleRemove}
+          deletingId={deletingId}
         />
       </Card>
 
