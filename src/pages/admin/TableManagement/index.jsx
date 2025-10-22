@@ -28,8 +28,6 @@ const TableManagement = () => {
       const res = await tableAPI.getAll()
       return res.data || []
     },
-    staleTime: 60000,
-    refetchOnWindowFocus: false,
     onError: () => toast.error('Không thể tải bàn ăn, vui lòng thử lại!'),
   })
 

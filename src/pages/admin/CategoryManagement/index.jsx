@@ -28,8 +28,6 @@ const CategoryManagement = () => {
       const res = await categoryAPI.getAll()
       return res.data || []
     },
-    staleTime: 60000,
-    refetchOnWindowFocus: false,
     onError: () => toast.error('Không thể tải danh mục, vui lòng thử lại!'),
   })
 
