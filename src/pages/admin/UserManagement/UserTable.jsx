@@ -1,11 +1,10 @@
 import React, { useMemo } from 'react'
-import { Table, Image, Popconfirm, Tag } from 'antd'
+import { Table, Popconfirm, Tag } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import AntButton from '@/components/AntButton'
+import { ROLE_MAP } from '@/shared/constants/user'
 
-import { STATUS_CATEGORY_MAP } from '@/shared/constants/category'
-
-const CategoryTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
+const UserTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
   const columns = useMemo(
     () => [
       {
@@ -15,26 +14,15 @@ const CategoryTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
         render: (_, __, index) => <span>{index + 1}</span>,
         width: 70,
       },
-      { title: 'Tên danh mục', dataIndex: 'category_name' },
+      { title: 'Tên người dùng', dataIndex: 'username' },
+      { title: 'Email', dataIndex: 'email' },
+      { title: 'Số điện thoại', dataIndex: 'phone' },
       {
-        title: 'Hình ảnh',
-        dataIndex: 'imageUrl',
-        render: (url) => (
-          <Image
-            src={url}
-            width={100}
-            height={100}
-            className="rounded-lg object-cover"
-            preview={false}
-          />
-        ),
-      },
-      {
-        title: 'Trạng thái',
-        dataIndex: 'status',
+        title: 'Vai trò',
+        dataIndex: 'role',
         render: (status) => {
-          const info = STATUS_CATEGORY_MAP[status]
-          return <Tag color={info?.color}>{info?.text}</Tag>
+          const info = ROLE_MAP[status]
+          return <Tag color={info.color}>{info.text}</Tag>
         },
       },
       {
@@ -67,4 +55,4 @@ const CategoryTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
   return <Table rowKey="_id" loading={loading} columns={columns} dataSource={data} />
 }
 
-export default CategoryTable
+export default UserTable
