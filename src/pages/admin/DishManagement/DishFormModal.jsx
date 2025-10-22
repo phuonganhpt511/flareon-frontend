@@ -31,7 +31,6 @@ const DishFormModal = ({ open, title, submitting, form, onOk, onCancel }) => {
       okText="Lưu"
       cancelText="Hủy"
       confirmLoading={submitting}
-      destroyOnClose
     >
       <Form form={form} layout="vertical" initialValues={DEFAULT_FORM_VALUES}>
         <Form.Item

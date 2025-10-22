@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react'
-import { Table, Image, Badge, Popconfirm } from 'antd'
+import { Table, Image, Popconfirm, Tag } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import AntButton from '@/components/AntButton'
 
-import { STATUS_MAP } from '@/shared/constants/category'
+import { STATUS_CATEGORY_MAP } from '@/shared/constants/category'
 
 const CategoryTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
   const columns = useMemo(
@@ -33,8 +33,8 @@ const CategoryTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
         title: 'Trạng thái',
         dataIndex: 'status',
         render: (status) => {
-          const info = STATUS_MAP[status]
-          return <Badge status={info.color} text={info.text} />
+          const info = STATUS_CATEGORY_MAP[status]
+          return <Tag color={info?.color}>{info?.text}</Tag>
         },
       },
       {
