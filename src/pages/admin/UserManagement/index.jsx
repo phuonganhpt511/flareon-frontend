@@ -26,8 +26,6 @@ const UserManagement = () => {
       const res = await userAPI.getAll()
       return res.data || []
     },
-    staleTime: 60000,
-    refetchOnWindowFocus: false,
     onError: () => toast.error('Không thể tải người dùng, vui lòng thử lại!'),
   })
 
