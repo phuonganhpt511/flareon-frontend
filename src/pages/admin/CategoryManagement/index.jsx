@@ -1,105 +1,134 @@
-import React, { useEffect, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
-import { Card, Breadcrumb } from 'antd'
+import { Card, Breadcrumb, Form } from 'antd'
 import { PlusCircleOutlined } from '@ant-design/icons'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import AntButton from '@/components/AntButton'
 import categoryAPI from '@/apis/category/category.api'
-import { CategorySchema } from '@/shared/validations/category.schema'
 import CategoryTable from './CategoryTable'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import CategoryFormModal from './CategoryFormModal'
-import { DEFAULT_FORM_VALUES } from '@/shared/constants/category'
+
+const categoryKeys = {
+  all: ['categories'],
+  list: () => ['categories', 'list'],
+  detail: (id) => ['categories', 'detail', id],
+}
 
 const CategoryManagement = () => {
-  const [categories, setCategories] = useState([])
+  const [form] = Form.useForm()
+  const queryClient = useQueryClient()
   const [isOpenModal, setIsOpenModal] = useState(false)
-  const [rowData, setRowData] = useState(null)
-  const [submitting, setSubmitting] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [editingRow, setEditingRow] = useState(null)
+  const [deletingId, setDeletingId] = useState(null)
 
-  const fetchCategories = async () => {
-    try {
-      setIsLoading(true)
+  // GET LIST
+  const { data: categories = [], isLoading } = useQuery({
+    queryKey: categoryKeys.list(),
+    queryFn: async () => {
       const res = await categoryAPI.getAll()
-      setCategories(res.data)
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+      return res.data || []
+    },
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
+    onError: () => toast.error('Không thể tải danh mục, vui lòng thử lại!'),
+  })
 
-  useEffect(() => {
-    fetchCategories()
-  }, [])
+  // CREATE
+  const createMutation = useMutation({
+    mutationFn: (payload) => categoryAPI.create(payload),
+    onSuccess: () => {
+      toast.success('Thêm danh mục thành công!')
+      queryClient.invalidateQueries({ queryKey: categoryKeys.list() })
+      closeModal()
+    },
+    onError: () => toast.error('Thêm danh mục thất bại!'),
+  })
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(CategorySchema),
-    defaultValues: DEFAULT_FORM_VALUES,
+  // UPDATE
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }) => categoryAPI.update(id, payload),
+    onSuccess: async () => {
+      toast.success('Cập nhật danh mục thành công!')
+      await queryClient.invalidateQueries({ queryKey: categoryKeys.list() })
+      closeModal()
+    },
+    onError: () => toast.error('Cập nhật danh mục thất bại!'),
+  })
+
+  // DELETE
+  const deleteMutation = useMutation({
+    mutationFn: (id) => categoryAPI.delete(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: categoryKeys.list() })
+      const previous = queryClient.getQueryData(categoryKeys.list())
+      queryClient.setQueryData(categoryKeys.list(), (old) =>
+        Array.isArray(old) ? old.filter((x) => x._id !== id) : old
+      )
+      return { previous }
+    },
+    onError: (_e, _id, ctx) => {
+      queryClient.setQueryData(categoryKeys.list(), ctx?.previous)
+      toast.error('Xoá danh mục thất bại!')
+    },
+    onSuccess: () => {
+      toast.success('Xoá danh mục thành công!')
+    },
+    onSettled: () => {
+      setDeletingId(null)
+      queryClient.invalidateQueries({ queryKey: categoryKeys.list() })
+    },
   })
 
   const openCreate = () => {
-    setRowData(null)
-    reset(DEFAULT_FORM_VALUES)
+    setEditingRow(null)
+    form.resetFields()
     setIsOpenModal(true)
   }
 
   const openEdit = (record) => {
-    setRowData(record)
-    reset({
+    setEditingRow(record)
+    form.resetFields()
+    form.setFieldsValue({
       category_name: record.category_name,
       description: record.description || '',
       imageUrl: record.imageUrl || '',
-      status: record.status ?? 1,
+      status: typeof record.status === 'number' ? record.status : 1,
     })
     setIsOpenModal(true)
   }
 
-  const handleRemove = async (id) => {
-    try {
-      await categoryAPI.delete(id)
-      toast.success('Xoá danh mục thành công!')
-      setCategories((prev) => prev.filter((item) => item._id !== id))
-    } catch (e) {
-      console.error(e)
-      toast.error('Xoá danh mục thất bại!')
-    }
+  const handleRemove = (id) => {
+    deleteMutation.mutate(id)
   }
 
-  const onSubmit = async (values) => {
-    const payload = {
-      category_name: values.category_name,
-      description: values.description,
-      imageUrl: values.imageUrl,
-      status: values.status,
-    }
+  const closeModal = () => {
+    form.resetFields()
+    setIsOpenModal(false)
+    setEditingRow(null)
+  }
 
+  const submitting = createMutation.isPending || updateMutation.isPending
+  const modalTitle = useMemo(
+    () => (editingRow ? 'Cập nhật danh mục' : 'Thêm danh mục'),
+    [editingRow]
+  )
+
+  const handleOk = async () => {
     try {
-      setSubmitting(true)
-      if (rowData) {
-        await categoryAPI.update(rowData._id, payload)
-        await fetchCategories()
-        toast.success('Cập nhật danh mục thành công!')
-      } else {
-        const res = await categoryAPI.create(payload)
-        toast.success('Thêm danh mục thành công!')
-        setCategories((prev) => [res.data, ...prev])
+      const values = await form.validateFields()
+      const payload = {
+        category_name: values.category_name,
+        description: values.description,
+        imageUrl: values.imageUrl,
+        status: values.status,
       }
-      setIsOpenModal(false)
-      setRowData(null)
-      reset(DEFAULT_FORM_VALUES)
-    } catch (e) {
-      console.error(e)
-      toast.error('Lưu danh mục thất bại!')
-    } finally {
-      setSubmitting(false)
+      if (editingRow) {
+        updateMutation.mutate({ id: editingRow._id, payload })
+      } else {
+        createMutation.mutate(payload)
+      }
+    } catch {
+      // Lỗi validate
     }
   }
 
@@ -122,22 +151,17 @@ const CategoryManagement = () => {
           loading={isLoading}
           onEdit={openEdit}
           onRemove={handleRemove}
+          deletingId={deletingId}
         />
       </Card>
 
       <CategoryFormModal
-        isOpen={isOpenModal}
-        rowData={rowData}
+        open={isOpenModal}
+        title={modalTitle}
         submitting={submitting}
-        control={control}
-        errors={errors}
-        setValue={setValue}
-        handleOk={handleSubmit(onSubmit)}
-        onCancel={() => {
-          reset(DEFAULT_FORM_VALUES)
-          setIsOpenModal(false)
-          setRowData(null)
-        }}
+        form={form}
+        onOk={handleOk}
+        onCancel={closeModal}
       />
     </>
   )

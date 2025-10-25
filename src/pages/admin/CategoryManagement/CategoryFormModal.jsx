@@ -1,92 +1,46 @@
-import React from 'react'
 import { Modal, Form, Input, Select } from 'antd'
-import { Controller } from 'react-hook-form'
+import { DEFAULT_FORM_VALUES } from '@/shared/constants/category'
 
-const CategoryFormModal = ({
-  isOpen,
-  rowData,
-  submitting,
-  control,
-  errors,
-  setValue,
-  handleOk,
-  onCancel,
-}) => {
-  const validateStatus = (name) => (errors[name] ? 'error' : '')
-  const helpText = (name) => errors[name]?.message
-
+const CategoryFormModal = ({ open, title, submitting, form, onOk, onCancel }) => {
   return (
     <Modal
-      title={rowData ? 'Chỉnh sửa danh mục' : 'Thêm mới danh mục'}
+      title={title}
       centered
-      open={isOpen}
-      onOk={handleOk}
-      confirmLoading={submitting}
+      open={open}
+      onOk={onOk}
       onCancel={onCancel}
-      destroyOnClose
-      okText={rowData ? 'Cập nhật' : 'Thêm mới'}
+      okText="Lưu"
       cancelText="Hủy"
-      width={600}
+      confirmLoading={submitting}
+      destroyOnClose
     >
-      <Form layout="vertical">
+      <Form form={form} layout="vertical" initialValues={DEFAULT_FORM_VALUES}>
         <Form.Item
           label="Tên danh mục"
-          validateStatus={validateStatus('category_name')}
-          help={helpText('category_name')}
+          name="category_name"
+          rules={[{ required: true, message: 'Vui lòng nhập tên danh mục' }]}
         >
-          <Controller
-            name="category_name"
-            control={control}
-            render={({ field }) => <Input placeholder="Nhập tên danh mục" {...field} />}
-          />
+          <Input placeholder="Nhập tên danh mục" allowClear/>
         </Form.Item>
 
-        <Form.Item
-          label="Mô tả"
-          validateStatus={validateStatus('description')}
-          help={helpText('description')}
-        >
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => (
-              <Input.TextArea rows={3} placeholder="Nhập mô tả danh mục" {...field} />
-            )}
-          />
+        <Form.Item label="Mô tả" name="description">
+          <Input.TextArea placeholder="Mô tả..." rows={3} allowClear/>
         </Form.Item>
 
-        <Form.Item
-          label="Đường dẫn hình ảnh"
-          validateStatus={validateStatus('imageUrl')}
-          help={helpText('imageUrl')}
-        >
-          <Controller
-            name="imageUrl"
-            control={control}
-            render={({ field }) => (
-              <Input placeholder="https://example.com/images/do-uong.jpg" {...field} />
-            )}
-          />
+        <Form.Item label="Ảnh" name="imageUrl">
+          <Input placeholder="URL ảnh" allowClear/>
         </Form.Item>
 
         <Form.Item
           label="Trạng thái"
-          validateStatus={validateStatus('status')}
-          help={helpText('status')}
+          name="status"
+          rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}
         >
-          <Controller
-            name="status"
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                onChange={(v) => setValue('status', v)}
-                options={[
-                  { label: 'Hoạt động', value: 1 },
-                  { label: 'Ngừng hoạt động', value: 0 },
-                ]}
-              />
-            )}
+          <Select
+            options={[
+              { value: 1, label: 'Hoạt động' },
+              { value: 0, label: 'Ngừng hoạt động' },
+            ]}
           />
         </Form.Item>
       </Form>
