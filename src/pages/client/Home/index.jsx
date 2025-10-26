@@ -1,12 +1,15 @@
+import Categories from '@/layouts/DefaultLayout/components/Categories'
+import Features from '@/layouts/DefaultLayout/components/Features'
+import Hero from '@/layouts/DefaultLayout/components/Hero'
+import Products from '@/layouts/DefaultLayout/components/Products'
+
 const Home = () => {
   return (
     <>
-      <h1 className="text-4xl font-bold bg-amber-400">Home Page</h1>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum quae corporis fuga aperiam
-        consectetur aspernatur harum? Id, quibusdam magnam ut ullam illum sit alias eligendi
-        exercitationem voluptatem aspernatur harum velit!
-      </p>
+      <Hero />
+      <Features />
+      <Categories />
+      <Products />
     </>
   )
 }
