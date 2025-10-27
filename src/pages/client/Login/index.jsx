@@ -11,7 +11,7 @@ const GL_Logo = '/images/google.png'
 const LoginPage = () => {
     const [loading, setLoading] = useState(false)
 
-    // ✅ Hàm xử lý đăng nhập
+
     const handleSubmit = async (values) => {
         setLoading(true)
         try {
@@ -21,11 +21,11 @@ const LoginPage = () => {
             localStorage.setItem('token', res.data.token)
             localStorage.setItem('user', JSON.stringify(res.data.user))
 
-            message.success('Đăng nhập thành công 🎉')
-            // ✅ Chuyển hướng sau khi đăng nhập
+            message.success('Đăng nhập thành công ')
+
             window.location.href = '/dashboard'
         } catch (error) {
-            console.error('❌ Lỗi đăng nhập:', error.response?.data || error.message)
+            console.error(' Lỗi đăng nhập:', error.response?.data || error.message)
             if (error.response?.status === 400) {
                 message.error(error.response?.data?.message || 'Sai email hoặc mật khẩu!')
             } else {

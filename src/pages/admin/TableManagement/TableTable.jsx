@@ -1,41 +1,33 @@
 import React, { useMemo } from 'react'
-import { Table, Image, Popconfirm, Tag } from 'antd'
+import { Table, Popconfirm, QRCode, Tag } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import AntButton from '@/components/AntButton'
+import AppQRCode from '@/components/AppQRCode'
+import { STATUS_TABLE_MAP } from '@/shared/constants/table'
 
-import { STATUS_CATEGORY_MAP } from '@/shared/constants/category'
-
-const CategoryTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
+const TableTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
   const columns = useMemo(
     () => [
+      { title: 'Tên bàn', dataIndex: 'table_name' },
       {
-        title: 'STT',
-        dataIndex: 'index',
-        align: 'center',
-        render: (_, __, index) => <span>{index + 1}</span>,
-        width: 70,
-      },
-      { title: 'Tên danh mục', dataIndex: 'category_name' },
-      {
-        title: 'Hình ảnh',
-        dataIndex: 'imageUrl',
-        render: (url) => (
-          <Image
-            src={url}
-            width={100}
-            height={100}
-            className="rounded-lg object-cover"
-            preview={false}
-          />
-        ),
+        title: 'Sức chứa',
+        dataIndex: 'capacity',
+        render: (capacity) => <span>{capacity} người</span>,
       },
       {
         title: 'Trạng thái',
         dataIndex: 'status',
         render: (status) => {
-          const info = STATUS_CATEGORY_MAP[status]
+          const info = STATUS_TABLE_MAP[status]
           return <Tag color={info?.color}>{info?.text}</Tag>
         },
+      },
+      {
+        title: 'QR Code',
+        dataIndex: '_id',
+        key: 'qrCode',
+        align: 'center',
+        render: (_, record) => <AppQRCode tableId={record._id} tableName={record.table_name} />,
       },
       {
         title: 'Thao tác',
@@ -46,7 +38,7 @@ const CategoryTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
           <div className="flex items-center gap-2">
             <AntButton title="Chỉnh sửa" icon={<EditOutlined />} onClick={() => onEdit(record)} />
             <Popconfirm
-              title="Bạn có chắc chắn muốn xoá danh mục này?"
+              title="Bạn có chắc chắn muốn xoá bàn này?"
               onConfirm={() => onRemove(record._id)}
               okText="Có"
               cancelText="Không"
@@ -67,4 +59,4 @@ const CategoryTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
   return <Table rowKey="_id" loading={loading} columns={columns} dataSource={data} />
 }
 
-export default CategoryTable
+export default TableTable

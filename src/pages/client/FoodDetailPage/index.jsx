@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import CommentCard from '@/layouts/DefaultLayout/components/CommentCard';
+import axios from 'axios';
 
 
 const foodData = {
@@ -32,6 +33,9 @@ const foodData = {
 };
 
 
+
+
+
 const FoodDetailPage = () => {
     const [quantity, setQuantity] = useState(1);
 
@@ -43,8 +47,16 @@ const FoodDetailPage = () => {
         setQuantity(prev => (prev > 1 ? prev - 1 : 1));
     };
 
+    const getFeedbacksByDish = async (dishId) => {
+        const res = await axios.get("http://localhost:3000/")
+
+    }
+
+
+
     return (
         <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+            <h1>do hang</h1>
             {/* Phần thông tin chính của món ăn */}
             <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
                 {/* Ảnh món ăn */}

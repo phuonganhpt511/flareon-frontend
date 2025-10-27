@@ -1,4 +1,4 @@
-export const STATUS_MAP = {
+export const STATUS_CATEGORY_MAP = {
   1: { color: 'success', text: 'Hoạt động' },
   0: { color: 'error', text: 'Ngừng hoạt động' },
 }

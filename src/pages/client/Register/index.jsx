@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { Button, Input, Form, Typography, Divider, message } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import axios from 'axios'
+import { useNavigate } from 'react-router'
 
 const { Title, Text, Link } = Typography
 
@@ -10,28 +11,29 @@ const FLAREON_LOGO = '/images/Logo.svg'
 const GL_Logo = '/images/google.png'
 
 const RegisterPage = () => {
+    const nav = useNavigate();
     const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (values) => {
         setLoading(true)
         try {
-            // ✅ Gọi API backend (chạy port 3000)
+
             const res = await axios.post('http://localhost:3000/auth/register', {
                 ...values,
-                role: 0, // Mặc định là người dùng thường
+                role: 0,
             })
 
-            message.success('Đăng ký thành công 🎉')
+            message.success('Đăng ký thành công ')
 
-            // ✅ Nếu backend trả token và user
+
             if (res.data?.token) {
                 localStorage.setItem('token', res.data.token)
                 localStorage.setItem('user', JSON.stringify(res.data.user))
             }
 
-            // ✅ Chuyển hướng sang trang đăng nhập
+
             setTimeout(() => {
-                window.location.href = '/login'
+                nav("/login")
             }, 800)
         } catch (error) {
             console.error('❌ Lỗi đăng ký:', error)
