@@ -3,7 +3,7 @@ import { SmileOutlined } from '@ant-design/icons'
 const ProductCard = ({ product }) => {
   return (
     <div className="border rounded-lg overflow-hidden shadow hover:shadow-lg transition bg-white">
-      <img src={product.imageUrl} alt={product.name} className="w-full h-40 object-cover" />
+      <img src={product.image} alt={product.name} className="w-full h-40 object-cover" />
       <div className="p-3">
         <h3 className="font-semibold text-base">{product.name}</h3>
         <p className="text-sm text-gray-500">{product.description}</p>
