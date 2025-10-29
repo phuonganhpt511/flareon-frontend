@@ -34,7 +34,10 @@ const Header = () => {
             >
               Danh mục
             </NavLink>
-            <NavLink to="/dishes" className="text-gray-700 hover:text-orange-500 transition-colors">
+            <NavLink
+              to="/category"
+              className="text-gray-700 hover:text-orange-500 transition-colors"
+            >
               Món ăn
             </NavLink>
             <NavLink
