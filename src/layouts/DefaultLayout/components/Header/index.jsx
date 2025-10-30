@@ -29,7 +29,11 @@ const Header = () => {
               Tính năng
             </NavLink>
             <NavLink
+
               to="/category"
+
+
+
               className="text-gray-700 hover:text-orange-500 transition-colors"
             >
               Danh mục
@@ -72,7 +76,11 @@ const Header = () => {
                 Tính năng
               </NavLink>
               <NavLink
+
                 to="/category"
+
+
+
                 className="text-gray-700 hover:text-orange-500 transition-colors"
               >
                 Danh mục
