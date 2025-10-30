@@ -1,60 +1,96 @@
-import { SearchOutlined } from '@ant-design/icons';
+import { useState } from 'react'
+import { NavLink } from 'react-router'
+import { FlameKindling, Menu, X } from 'lucide-react'
+
+import AntButton from '@/components/AntButton'
 
 const Header = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
   return (
-    <header className="w-full bg-white shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto flex items-center justify-between p-3">
-        {/* Logo */}
-        <div className="flex items-center gap-2">
-          <img
-            src="/images/Logo.png"
-            alt="Shop Logo"
-            className="h-9 w-auto object-contain"
-          />
-        </div>
-
-        {/* Search bar (chỉ hiện trên md trở lên) */}
-        <div className="flex-1 mx-4 hidden sm:block">
-          <div className="flex items-center border border-orange-400 rounded-lg px-3 py-2">
-            <SearchOutlined />
-            <input
-              type="text"
-              placeholder="Search"
-              className="w-full outline-none text-sm"
-            />
-          </div>
-        </div>
-
-        {/* Icons bên phải */}
-        <div className="flex items-center gap-4 text-orange-500">
-          {/* Desktop: full icons */}
-          <div className="hidden sm:flex items-center gap-5">
-            {/* <ListOrdered size={22} className="cursor-pointer" />
-            <Bell size={22} className="cursor-pointer" />
-            <ShoppingCart size={22} className="cursor-pointer" />
-            <Menu size={24} className="cursor-pointer" /> */}
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
+      <nav className="max-w-7xl mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+              <FlameKindling className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-xl text-gray-900">Flareon</span>
           </div>
 
-          {/* Mobile: chỉ hiển thị 3 icon cơ bản */}
-          <div className="flex sm:hidden items-center gap-4">
-            {/* <Bell size={22} className="cursor-pointer" />
-            <ShoppingCart size={22} className="cursor-pointer" />
-            <Menu size={24} className="cursor-pointer" /> */}
+          <div className="hidden md:flex items-center gap-8">
+            <NavLink to="/" className="text-gray-700 hover:text-orange-500 transition-colors">
+              Trang chủ
+            </NavLink>
+            <NavLink
+              to="/features"
+              className="text-gray-700 hover:text-orange-500 transition-colors"
+            >
+              Tính năng
+            </NavLink>
+            <NavLink
+              to="/category"
+              className="text-gray-700 hover:text-orange-500 transition-colors"
+            >
+              Danh mục
+            </NavLink>
+            <NavLink to="/dishes" className="text-gray-700 hover:text-orange-500 transition-colors">
+              Món ăn
+            </NavLink>
+            <NavLink
+              to="/contact"
+              className="text-gray-700 hover:text-orange-500 transition-colors"
+            >
+              Liên hệ
+            </NavLink>
           </div>
-        </div>
-      </div>
 
-      {/* Search bar cho mobile */}
-      <div className="px-3 pb-2 sm:hidden">
-        <div className="flex items-center border border-orange-400 rounded-lg px-3 py-2">
-          <SearchOutlined />
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-full outline-none text-sm"
-          />
+          <div className="hidden md:flex items-center gap-4">
+            <AntButton type="primary">Đăng nhập</AntButton>
+            <AntButton>Đăng ký</AntButton>
+          </div>
+
+          <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? (
+              <X className="w-6 h-6 text-gray-700" />
+            ) : (
+              <Menu className="w-6 h-6 text-gray-700" />
+            )}
+          </button>
         </div>
-      </div>
+
+        {isMenuOpen && (
+          <div className="md:hidden mt-4 py-4 border-t border-gray-200">
+            <div className="flex flex-col gap-4">
+              <NavLink to="/" className="text-gray-700 hover:text-orange-500 transition-colors">
+                Trang chủ
+              </NavLink>
+              <NavLink
+                to="/features"
+                className="text-gray-700 hover:text-orange-500 transition-colors"
+              >
+                Tính năng
+              </NavLink>
+              <NavLink
+                to="/category"
+                className="text-gray-700 hover:text-orange-500 transition-colors"
+              >
+                Danh mục
+              </NavLink>
+              <NavLink
+                to="/contact"
+                className="text-gray-700 hover:text-orange-500 transition-colors"
+              >
+                Liên hệ
+              </NavLink>
+              <div className="flex flex-col gap-2 pt-4 border-t border-gray-200">
+                <AntButton type="primary">Đăng nhập</AntButton>
+                <AntButton>Đăng ký</AntButton>
+              </div>
+            </div>
+          </div>
+        )}
+      </nav>
     </header>
   )
 }

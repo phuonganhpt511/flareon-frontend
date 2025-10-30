@@ -2,10 +2,9 @@ import React, { useMemo } from 'react'
 import { Table, Image, Popconfirm, Tag } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import AntButton from '@/components/AntButton'
+import { STATUS_DISH_MAP } from '@/shared/constants/dish'
 
-import { STATUS_CATEGORY_MAP } from '@/shared/constants/category'
-
-const CategoryTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
+const DishTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
   const columns = useMemo(
     () => [
       {
@@ -15,7 +14,7 @@ const CategoryTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
         render: (_, __, index) => <span>{index + 1}</span>,
         width: 70,
       },
-      { title: 'Tên danh mục', dataIndex: 'category_name' },
+      { title: 'Tên món ăn', dataIndex: 'dish_name' },
       {
         title: 'Hình ảnh',
         dataIndex: 'imageUrl',
@@ -29,12 +28,15 @@ const CategoryTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
           />
         ),
       },
+      { title: 'Giá', dataIndex: 'price' },
+      { title: 'Mô tả', dataIndex: 'description' },
+      { title: 'Danh mục', dataIndex: ['category_id', 'category_name'] },
       {
         title: 'Trạng thái',
         dataIndex: 'status',
         render: (status) => {
-          const info = STATUS_CATEGORY_MAP[status]
-          return <Tag color={info?.color}>{info?.text}</Tag>
+          const info = STATUS_DISH_MAP[status]
+          return <Tag color={info.color}>{info.text}</Tag>
         },
       },
       {
@@ -67,4 +69,4 @@ const CategoryTable = ({ data, loading, onEdit, onRemove, deletingId }) => {
   return <Table rowKey="_id" loading={loading} columns={columns} dataSource={data} />
 }
 
-export default CategoryTable
+export default DishTable
