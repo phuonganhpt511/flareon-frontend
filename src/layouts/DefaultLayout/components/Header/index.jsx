@@ -1,4 +1,5 @@
-import { useState } from 'react'
+
+import { use, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { FlameKindling, Menu, X, Clock } from 'lucide-react'
 import { Modal, List, Button } from 'antd'
@@ -6,6 +7,7 @@ import AntButton from '@/components/AntButton'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const nav = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false)
   const navigate = useNavigate()
 
@@ -73,16 +75,15 @@ const Header = () => {
               Tính năng
             </NavLink>
             <NavLink
-
               to="/category"
-
-
-
               className="text-gray-700 hover:text-orange-500 transition-colors"
             >
               Danh mục
             </NavLink>
-            <NavLink to="/dishes" className="text-gray-700 hover:text-orange-500 transition-colors">
+            <NavLink
+              to="/category"
+              className="text-gray-700 hover:text-orange-500 transition-colors"
+            >
               Món ăn
             </NavLink>
             <NavLink
@@ -157,8 +158,8 @@ const Header = () => {
               </Button>
 
               <div className="flex flex-col gap-2 pt-4 border-t border-gray-200">
-                <AntButton type="primary">Đăng nhập</AntButton>
-                <AntButton>Đăng ký</AntButton>
+                <AntButton onClick={() => nav("/login")} type="primary">Đăng nhập</AntButton>
+                <AntButton onClick={() => nav("/register")} >Đăng ký</AntButton>
               </div>
             </div>
           </div>

@@ -1,107 +1,165 @@
-import React, { useState } from 'react'
-import { Button, Input, Form, Typography, Divider, message } from 'antd'
+import React from 'react'
+import { Button, Input, Form, Typography, Divider, notification } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
-import axios from 'axios'
+// 1. IMPORT THƯ VIỆN CẦN THIẾT
+import { useMutation } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
+import authAPI from '@/apis/auth/auth.api' // Đảm bảo đường dẫn đúng
 
 const { Title, Text, Link } = Typography
 
-const FLAREON_LOGO = '/images/Logo.svg'
-const GL_Logo = '/images/google.png'
+const FLAREON_LOGO = '/public/images/Logo.png'
+const GL_Logo = '/public/images/google.png'
 
-const LoginPage = () => {
-    const [loading, setLoading] = useState(false)
+const Login = () => {
+  const navigate = useNavigate()
+  const [form] = Form.useForm()
 
-    // ✅ Hàm xử lý đăng nhập
-    const handleSubmit = async (values) => {
-        setLoading(true)
-        try {
-            const res = await axios.post('http://localhost:3000/auth/login', values)
+  // --- LOGIC GỌI API ĐĂNG NHẬP ---
+  const loginMutation = useMutation({
+    mutationFn: (payload) => authAPI.login(payload),
 
-            // ✅ Lưu token và user vào localStorage
-            localStorage.setItem('token', res.data.token)
-            localStorage.setItem('user', JSON.stringify(res.data.user))
+    onSuccess: (data) => {
+      // Giả định Backend trả về: { token: '...', user: { _id: '...', ... } }
+      const token = data.token || data.accessToken;
+      const userObject = data.user; // Lấy toàn bộ đối tượng user
 
-            message.success('Đăng nhập thành công 🎉')
-            // ✅ Chuyển hướng sau khi đăng nhập
-            window.location.href = '/dashboard'
-        } catch (error) {
-            console.error('❌ Lỗi đăng nhập:', error.response?.data || error.message)
-            if (error.response?.status === 400) {
-                message.error(error.response?.data?.message || 'Sai email hoặc mật khẩu!')
-            } else {
-                message.error('Lỗi kết nối tới máy chủ. Vui lòng thử lại sau!')
-            }
-        } finally {
-            setLoading(false)
-        }
+      if (token && userObject && userObject._id) { // Kiểm tra token và user object hợp lệ
+        // 1. LƯU TOKEN
+        localStorage.setItem('token', token);
+
+        // 2. ✅ SỬA: LƯU TOÀN BỘ OBJECT USER (DƯỚI DẠNG CHUỖI JSON) VÀO KEY 'user'
+        //    Điều này khớp với logic mà hàm handleAddToCart đang tìm kiếm
+        localStorage.setItem('user', JSON.stringify(userObject));
+
+        // ⚠️ Xóa userId riêng để tránh nhầm lẫn (có thể bỏ qua nếu bạn không lưu userId riêng ở đâu khác)
+        localStorage.removeItem('userId');
+
+        notification.success({
+          message: 'Đăng nhập thành công! 🎉',
+          description: 'Chào mừng trở lại! Đang chuyển hướng...',
+          placement: 'topRight',
+        });
+
+        // Chuyển hướng về trang chủ
+        navigate('/');
+      } else {
+        notification.error({
+          message: 'Lỗi Dữ liệu',
+          description: 'Phản hồi từ máy chủ không chứa token hoặc ID người dùng hợp lệ.',
+          placement: 'topRight',
+        });
+      }
+    },
+
+    onError: (error) => {
+      console.error('Lỗi đăng nhập:', error.response?.data)
+      const message = error.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.';
+      notification.error({
+        message: 'Lỗi Đăng nhập',
+        description: message,
+        placement: 'topRight',
+      });
+    },
+  })
+
+  // 3. Hàm xử lý sự kiện submit form
+  const onFinish = (values) => {
+    const payload = {
+      email: values.email, // Gửi email
+      password: values.password, // Gửi mật khẩu
     }
+    loginMutation.mutate(payload)
+  }
 
-    return (
-        <div className="flex flex-col items-center justify-start min-h-screen bg-white">
-            {/* Header */}
-            <header className="w-full flex justify-between items-center p-4">
-                <Link href="/" className="flex items-center !text-lg !text-orange-500 font-bold">
-                    <ArrowLeftOutlined className="mr-1" /> Quay lại
-                </Link>
-            </header>
+  return (
+    <div className="flex flex-col items-center justify-start min-h-screen bg-white">
+      <header className="w-full flex justify-between items-center p-4">
+        <Link
+          onClick={() => navigate('/')}
+          className="flex items-center !text-lg !text-orange-500 !hover:text-orange-500 font-bold cursor-pointer"
+        >
+          <ArrowLeftOutlined className="mr-1" />
+          Quay lại
+        </Link>
+      </header>
 
-            {/* Nội dung form */}
-            <div className="w-full max-w-sm px-4 mt-8">
-                <div className="text-center mb-10">
-                    <img src={FLAREON_LOGO} className="mx-auto h-20 mb-6" alt="Flareon Logo" />
-                    <Title level={4} className="!text-xl !font-semibold !text-orange-500">
-                        Đăng nhập Flareon
-                    </Title>
-                </div>
+      <div className="w-full max-w-sm px-4 mt-8">
+        <div className="text-center mb-10">
+          <img src={FLAREON_LOGO} alt="Logo" className="mx-auto h-20 mb-6" />
+          <Title level={4} className="!text-xl !font-semibold !text-orange-500">
+            Đăng nhập
+          </Title>
+        </div>
 
-                {/* ✅ Form đăng nhập */}
-                <Form layout="vertical" onFinish={handleSubmit}>
-                    <Form.Item
-                        name="email"
-                        rules={[
-                            { required: true, message: 'Vui lòng nhập email!' },
-                            { type: 'email', message: 'Email không hợp lệ!' },
-                        ]}
-                    >
-                        <Input
-                            placeholder="Email"
-                            className="!rounded-lg !h-14 !text-lg placeholder:!text-gray-400 !border-orange-500"
-                        />
-                    </Form.Item>
+        <Form form={form} layout="vertical" onFinish={onFinish}>
 
-                    <Form.Item
-                        name="password"
-                        rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
-                    >
-                        <Input.Password
-                            placeholder="Mật khẩu"
-                            className="!rounded-lg !h-14 !text-lg placeholder:!text-gray-400 !border-orange-500"
-                        />
-                    </Form.Item>
+          <Form.Item
+            name="email" // Trường Email
+            rules={[
+              { required: true, message: 'Vui lòng nhập Email!' },
+              { type: 'email', message: 'Email không đúng định dạng!' }
+            ]}
+          >
+            <Input
+              placeholder="Email"
+              className="!rounded-lg !h-14 !text-lg placeholder:!text-orange-500 !border-orange-500"
+            />
+          </Form.Item>
 
-                    <Form.Item className="mt-6">
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            block
-                            size="large"
-                            loading={loading}
-                            className="!h-14 !rounded-lg !text-xl !font-bold !bg-orange-500 hover:!bg-orange-600 !border-none"
-                        >
-                            Đăng nhập
-                        </Button>
-                    </Form.Item>
-                </Form>
+          <Form.Item
+            name="password" // Trường Mật khẩu
+            rules={[{ required: true, message: 'Vui lòng nhập Mật Khẩu!' }]}
+            hasFeedback
+          >
+            <Input.Password // Dùng Input.Password
+              placeholder="Mật Khẩu"
+              className="!rounded-lg !h-14 !text-lg placeholder:!text-orange-500 !border-orange-500"
+            />
+          </Form.Item>
 
-                <Divider plain className="!my-8">
-                    <Text type="secondary" className="!text-gray-500">Hoặc</Text>
-                </Divider>
+          {/* Nút Đăng nhập */}
+          <Form.Item className="mt-6">
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              size="large"
+              loading={loginMutation.isPending} // Hiển thị loading
+              className="!h-14 !rounded-lg !text-xl !font-bold !bg-orange-500 hover:!bg-orange-600 !border-none"
+            >
+              Đăng nhập
+            </Button>
+          </Form.Item>
+        </Form>
 
-                {/* Các lựa chọn đăng nhập khác */}
-                <div className="space-y-4">
-                    <Button block size="large" className="!h-14 !rounded-lg !text-lg !font-semibold !bg-gray-100 hover:!bg-gray-200">
-                        Sign in
-                    </Button>
+        <Divider plain className="!my-8">
+          <Text type="secondary" className="!text-gray-500">
+            or
+          </Text>
+        </Divider>
+
+        {/* Đăng ký / Đăng nhập với Google */}
+        <div className="space-y-4">
+          <Button
+            block
+            size="large"
+            onClick={() => navigate('/register')} // Chuyển hướng đến trang Đăng ký
+            className="!h-14 !rounded-lg !text-lg !font-semibold !bg-gray-100 !border-none hover:!bg-gray-200"
+          >
+            Đăng ký
+          </Button>
+
+          {/* Continue with Google */}
+          <Button
+            block
+            size="large"
+            icon={<img src={GL_Logo} alt="Google" className="h-6 mr-2" />}
+            className="!h-14 !rounded-lg !text-lg !font-semibold !bg-gray-100 !border-none hover:!bg-gray-200"
+          >
+            Continue with Google
+          </Button>
+        </div>
 
                     <Button
                         block
@@ -131,16 +189,4 @@ const LoginPage = () => {
     )
 }
 
-export default LoginPage
-
-
-
-
-
-
-
-
-
-
-
-
+export default Login
