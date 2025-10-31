@@ -206,25 +206,22 @@ const Register = () => {
           </Button>
         </div>
 
-        {/*privacy policy */}
-        <div className="text-center text-xs text-gray-500 mb-20 px-4 mt-10">
-          <Text type="secondary" className="!text-gray-500 text-sm">
-            By clicking continue, you agree to our
-            <Link href="/terms" className="!font-bold !text-gray-800 hover:!text-orange-500">
-              {' '}
-              Terms of Service{' '}
-            </Link>
-            and
-            <br />
-            <Link href="/privacy" className="!font-bold !text-gray-800 hover:!text-orange-500">
-              {' '}
-              Privacy Policy
-            </Link>
-          </Text>
+                <div className="text-center text-xs text-gray-500 mb-20 px-4 mt-10">
+                    <Text type="secondary" className="!text-gray-500 text-sm">
+                        Bằng cách đăng ký, bạn đồng ý với
+                        <Link href="/terms" className="!font-bold !text-gray-800 hover:!text-orange-500">
+                            {' '}Điều khoản dịch vụ{' '}
+                        </Link>
+                        và
+                        <br />
+                        <Link href="/privacy" className="!font-bold !text-gray-800 hover:!text-orange-500">
+                            {' '}Chính sách bảo mật
+                        </Link>
+                    </Text>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  )
+    )
 }
 
 export default Register

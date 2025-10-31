@@ -4,7 +4,9 @@ import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 import http from '@/apis/http'
 import { useParams, useNavigate, useLocation } from 'react-router' // Thêm hooks
 import Banner from '@/layouts/DefaultLayout/components/Banner'
+import ProductCard from '@/layouts/DefaultLayout/components/ProductCard'
 import ProductGrid from '@/layouts/DefaultLayout/components/ProductGrid'
+import { useQuery } from '@tanstack/react-query'
 
 const CategoryPage = () => {
   const { tableId: qrCode } = useParams()
@@ -132,6 +134,8 @@ const CategoryPage = () => {
     return <p className="text-center mt-10">Đang chuyển đến trang đăng nhập...</p>
   }
 
+  if (isLoading) return <p>Loading...</p>
+  if (error) return <p>Error: {error.message}</p>
   return (
     <div className="px-4 md:px-8">
       {/* Banner */}
