@@ -1,11 +1,12 @@
-import { useState } from 'react'
-import { NavLink } from 'react-router'
+import { use, useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { FlameKindling, Menu, X } from 'lucide-react'
 
 import AntButton from '@/components/AntButton'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const nav = useNavigate();
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
@@ -29,7 +30,7 @@ const Header = () => {
               Tính năng
             </NavLink>
             <NavLink
-              to="/categories"
+              to="/category"
               className="text-gray-700 hover:text-orange-500 transition-colors"
             >
               Danh mục
@@ -87,8 +88,8 @@ const Header = () => {
                 Liên hệ
               </NavLink>
               <div className="flex flex-col gap-2 pt-4 border-t border-gray-200">
-                <AntButton type="primary">Đăng nhập</AntButton>
-                <AntButton>Đăng ký</AntButton>
+                <AntButton onClick={() => nav("/login")} type="primary">Đăng nhập</AntButton>
+                <AntButton onClick={() => nav("/register")} >Đăng ký</AntButton>
               </div>
             </div>
           </div>
