@@ -1,83 +1,102 @@
-import React from 'react'
-import { Card, Table, Tag, Breadcrumb } from 'antd'
-
-const columns = [
-  {
-    title: 'Mã đơn',
-    dataIndex: 'orderId',
-    key: 'orderId',
-    render: (v) => <span className="font-medium">{v}</span>,
-  },
-  {
-    title: 'Khách hàng',
-    dataIndex: 'customer',
-    key: 'customer',
-  },
-  {
-    title: 'Trạng thái',
-    dataIndex: 'status',
-    key: 'status',
-    render: (status) => {
-      const map = {
-        Shipped: 'green',
-        Processing: 'blue',
-        Pending: 'gold',
-        Cancelled: 'red',
-      }
-      return <Tag color={map[status] || 'default'}>{status}</Tag>
-    },
-  },
-]
-
-const orders = [
-  {
-    key: 'a1',
-    orderId: '#INV-1042',
-    customer: 'Nguyen Van A',
-    status: 'Shipped',
-    total: 2450000,
-  },
-  {
-    key: 'a2',
-    orderId: '#INV-1043',
-    customer: 'Tran Thi B',
-    status: 'Pending',
-    total: 990000,
-  },
-  {
-    key: 'a3',
-    orderId: '#INV-1044',
-    customer: 'Le Van C',
-    status: 'Cancelled',
-    total: 0,
-  },
-  {
-    key: 'a5',
-    orderId: '#INV-1045',
-    customer: 'Pham D',
-    status: 'Processing',
-    total: 1200000,
-  },
-]
+import { useEffect, useState } from "react";
+import { Table, Tag, Button, Popconfirm, message } from "antd";
+import http from "@/apis/http";
+import { useNavigate } from "react-router-dom";
 
 const ReviewManagement = () => {
+  const [reviews, setReviews] = useState([]);
+  const navigate = useNavigate();
+
+  const loadData = () => {
+    http
+      .get("/feedback")
+      .then((res) => {
+        setReviews(res.data.data);
+      })
+      .catch(() => message.error("Lỗi khi tải danh sách đánh giá!"));
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const deleteReview = (id) => {
+    http
+      .delete(`/feedback/${id}`)
+      .then(() => {
+        message.success("Xoá đánh giá thành công!");
+        loadData();
+      })
+      .catch(() => message.error("Không thể xoá đánh giá!"));
+  };
+
+  const columns = [
+    {
+      title: "Người dùng",
+      dataIndex: "user_id",
+      render: (user) => user?.username || "Không rõ",
+    },
+    {
+      title: "Món ăn",
+      dataIndex: "dish_id",
+      render: (dish) => dish?.dish_name || "Không rõ",
+    },
+    {
+      title: "Đánh giá",
+      dataIndex: "rating",
+      render: (rating) => <span className="text-orange-500 font-bold">{rating}★</span>,
+    },
+    {
+      title: "Nội dung",
+      dataIndex: "content",
+      render: (text) => <span className="line-clamp-1">{text}</span>,
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      render: (status) => {
+        let color = "default";
+        if (status === "Pending") color = "gold";
+        if (status === "Resolved") color = "green";
+        if (status === "Rejected") color = "red";
+
+        return <Tag color={color}>{status}</Tag>;
+      },
+    },
+    {
+      title: "Thao tác",
+      render: (_, item) => (
+        <div className="flex gap-2">
+          <Button
+            type="primary"
+            onClick={() => navigate(`/admin/reviews/${item._id}`)}
+          >
+            Xem
+          </Button>
+
+          <Popconfirm
+            title="Bạn có chắc muốn xoá?"
+            onConfirm={() => deleteReview(item._id)}
+          >
+            <Button danger>Xoá</Button>
+          </Popconfirm>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <>
-      <section className="mb-3">
-        <h1 className="font-bold text-3xl mb-2">Quản lý đánh giá</h1>
-        <Breadcrumb items={[{ title: 'Trang chủ' }, { title: 'Quản lý đánh giá' }]} />
-      </section>
+    <div className="p-6 bg-white rounded-xl shadow">
+      <h1 className="text-2xl font-bold mb-4">Quản lý đánh giá</h1>
 
-      <Card className="shadow-sm rounded-2xl xl:col-span-2" title="Đơn hàng gần đây">
-        <Table
-          columns={columns}
-          dataSource={orders}
-          pagination={{ pageSize: 5 }}
-          className="rounded-xl"
-        />
-      </Card>
-    </>
-  )
-}
+      <Table
+        columns={columns}
+        rowKey="_id"
+        dataSource={reviews}
+        bordered
+      />
+    </div>
+  );
+};
 
-export default ReviewManagement
+export default ReviewManagement;
