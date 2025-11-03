@@ -1,6 +1,6 @@
 // src/pages/client/CategoryPage/index.jsx
 import React, { useEffect } from 'react' // Thêm useEffect
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import http from '@/apis/http'
 import { useParams, useNavigate, useLocation } from 'react-router' // Thêm hooks
 import Banner from '@/layouts/DefaultLayout/components/Banner'
@@ -10,7 +10,7 @@ const CategoryPage = () => {
   const { tableId: qrCode } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
 
   useEffect(() => {
     if (qrCode) {
@@ -132,6 +132,8 @@ const CategoryPage = () => {
     return <p className="text-center mt-10">Đang chuyển đến trang đăng nhập...</p>
   }
 
+  if (isLoading) return <p>Loading...</p>
+  if (error) return <p>Error: {error.message}</p>
   return (
     <div className="px-4 md:px-8">
       {/* Banner */}

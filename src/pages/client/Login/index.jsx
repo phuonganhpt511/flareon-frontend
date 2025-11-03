@@ -177,25 +177,31 @@ const Login = () => {
           </Button>
         </div>
 
-        {/*privacy policy */}
-        <div className="text-center text-xs text-gray-500 mb-20 px-4 mt-10">
-          <Text type="secondary" className="!text-gray-500 text-sm">
-            By clicking continue, you agree to our
-            <Link href="/terms" className="!font-bold !text-gray-800 hover:!text-orange-500">
-              {' '}
-              Terms of Service{' '}
-            </Link>
-            and
-            <br />
-            <Link href="/privacy" className="!font-bold !text-gray-800 hover:!text-orange-500">
-              {' '}
-              Privacy Policy
-            </Link>
-          </Text>
-        </div>
-      </div>
-    </div>
-  )
+                    <Button
+                        block
+                        size="large"
+                        icon={<img src={GL_Logo} alt="Google" className="h-6 mr-2" />}
+                        className="!h-14 !rounded-lg !text-lg !font-semibold !bg-gray-100 hover:!bg-gray-200"
+                    >
+                        Continue with Google
+                    </Button>
+                </div>
+
+                {/* Chính sách */}
+                <div className="text-center text-xs text-gray-500 mb-20 px-4 mt-10">
+                    <Text type="secondary" className="!text-gray-500 text-sm">
+                        Bằng cách tiếp tục, bạn đồng ý với
+                        <Link href="/terms" className="!font-bold !text-gray-800 hover:!text-orange-500">
+                            {' '}Điều khoản sử dụng{' '}
+                        </Link>
+                        và
+                        <Link href="/privacy" className="!font-bold !text-gray-800 hover:!text-orange-500">
+                            {' '}Chính sách bảo mật
+                        </Link>
+                    </Text>
+                </div>
+            </div>
+    )
 }
 
 export default Login

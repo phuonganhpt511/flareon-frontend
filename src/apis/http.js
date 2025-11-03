@@ -1,3 +1,4 @@
+// src/api/http.js
 import axios from 'axios'
 
 const http = axios.create({
@@ -8,7 +9,7 @@ const http = axios.create({
   },
 })
 
-// Add a request interceptor
+// Add a request interceptor (SỬA LỖI JSON.PARSE)
 http.interceptors.request.use(
   function (config) {
     const token = localStorage.getItem('token')
@@ -19,21 +20,21 @@ http.interceptors.request.use(
     return config
   },
   function (error) {
-    // Do something with request error
     return Promise.reject(error)
   }
 )
 
-// Add a response interceptor
+// Add a response interceptor (SỬA LỖI MÀN HÌNH TRẮNG KHI API 204)
 http.interceptors.response.use(
-  function ({ data }) {
-    // Any status code that lie within the range of 2xx cause this function to trigger
-    // Do something with response data
-    return data
+  function (response) {
+    // <-- 3. Nhận 'response' đầy đủ
+    // 4. Chỉ trả về 'response.data' NẾU 'response' tồn tại
+    if (response) {
+      return response.data
+    }
+    return response // Trả về an toàn
   },
   function (error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
     return Promise.reject(error)
   }
 )

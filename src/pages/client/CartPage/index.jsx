@@ -2,7 +2,6 @@
 import React from 'react'
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query' // Import đủ hooks
 import http from '@/apis/http'
-
 import { useNavigate } from 'react-router'
 import CartItem from './CartItem'
 
@@ -12,7 +11,6 @@ const CartPage = () => {
   const userString = localStorage.getItem('user')
   const userData = userString ? JSON.parse(userString) : null
   const userId = userData?._id // Lấy _id (dài) của user
-
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
@@ -211,5 +209,4 @@ const CartPage = () => {
     </div>
   )
 }
-
 export default CartPage
