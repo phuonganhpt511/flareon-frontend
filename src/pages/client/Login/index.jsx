@@ -185,7 +185,6 @@ const Login = () => {
                     </Text>
                 </div>
             </div>
-        </div>
     )
 }
 

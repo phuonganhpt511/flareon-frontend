@@ -1,18 +1,16 @@
 // src/pages/client/CategoryPage/index.jsx
 import React, { useEffect } from 'react' // Thêm useEffect
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import http from '@/apis/http'
 import { useParams, useNavigate, useLocation } from 'react-router' // Thêm hooks
 import Banner from '@/layouts/DefaultLayout/components/Banner'
-import ProductCard from '@/layouts/DefaultLayout/components/ProductCard'
 import ProductGrid from '@/layouts/DefaultLayout/components/ProductGrid'
-import { useQuery } from '@tanstack/react-query'
 
 const CategoryPage = () => {
   const { tableId: qrCode } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
 
   useEffect(() => {
     if (qrCode) {
