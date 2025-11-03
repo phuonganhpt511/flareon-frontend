@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, Input, Form, Typography, Divider, notification } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
-// IMPORT THƯ VIỆN & HOOKS
+
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import authAPI from '@/apis/auth/auth.api';
@@ -16,7 +16,7 @@ const Register = () => {
   const navigate = useNavigate()
   const [form] = Form.useForm()
 
-  // --- LOGIC GỌI API ĐĂNG KÝ (GIỮ NGUYÊN) ---
+
   const registerMutation = useMutation({
     mutationFn: (payload) => authAPI.register(payload),
 
@@ -26,11 +26,11 @@ const Register = () => {
         description: data.message || 'Vui lòng đăng nhập để tiếp tục.',
         placement: 'topRight',
       })
-      navigate('/login') // Chuyển hướng về trang đăng nhập
+      navigate('/login') 
     },
 
     onError: (error) => {
-      // Cải thiện logic hiển thị lỗi validation từ Backend
+ 
       let displayMessage = 'Đăng ký thất bại. Lỗi không xác định.';
       if (error.response?.data?.message) {
         // Xử lý lỗi validation từ MongoDB/Mongoose
