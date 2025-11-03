@@ -1,4 +1,4 @@
-// src/layouts/DefaultLayout/components/ProductGrid/index.jsx
+import { SmileOutlined } from '@ant-design/icons'
 import React from 'react'
 
 // Nhận prop onAddToCart (có thể là undefined nếu ở trang /category)
@@ -63,5 +63,4 @@ const ProductGrid = ({ products, onAddToCart }) => {
     </div>
   )
 }
-
 export default ProductGrid

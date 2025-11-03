@@ -29,7 +29,7 @@ const foodDataWithComments = {
 }
 
 const FoodDetailPage = () => {
-  const { id: productId } = useParams() // Lấy productId từ URL
+  const { id: productId } = useParams()
   const [quantity, setQuantity] = useState(1)
   const navigate = useNavigate()
   const location = useLocation()
@@ -37,7 +37,7 @@ const FoodDetailPage = () => {
 
   // --- GỌI API LẤY CHI TIẾT SẢN PHẨM (TRỪ COMMENTS) ---
   const {
-    data: foodDetails, // Dữ liệu sản phẩm (tên, ảnh, giá...) từ API
+    data: foodDetails,
     isLoading,
     error,
     isError,
@@ -69,9 +69,19 @@ const FoodDetailPage = () => {
       console.log('Gọi POST /cart/add-item:', payload)
       return http.post('/cart/add-item', payload)
     },
+    // === 3. THÊM LOGIC "RUNG CHUÔNG" VÀO ĐÂY ===
     onSuccess: (response, variables) => {
       console.log('Thêm vào giỏ thành công!', response)
       alert(`Đã thêm ${variables.quantity} "${variables.dishName}" vào giỏ!`)
+
+      // Lấy ID bàn và user từ 'variables' (dữ liệu đã gửi đi)
+      const { table_id: tableId, user_id: userId } = variables
+
+      if (tableId && userId) {
+        console.log('Làm mới query giỏ hàng:', ['cart', tableId, userId])
+        // Báo cho Header (và CartPage) gọi lại API GET /cart
+        queryClient.invalidateQueries({ queryKey: ['cart', tableId, userId] })
+      }
     },
     onError: (err, variables) => {
       console.error(`Lỗi khi thêm '${variables.dishName}' vào giỏ:`, err)

@@ -57,9 +57,17 @@ const CategoryPage = () => {
       return http.post('/cart/add-item', payload)
     },
     onSuccess: (response, variables) => {
-      /* ... alert thành công ... */
       console.log('Thêm thành công!', response)
       alert(`Đã thêm "${variables.dishName}" vào giỏ!`)
+
+      const { table_id: tableId, user_id: userId } = variables
+
+      if (tableId && userId) {
+        console.log('Làm mới query giỏ hàng:', ['cart', tableId, userId])
+        // Báo cho Header (và CartPage) gọi lại API GET /cart
+        queryClient.invalidateQueries({ queryKey: ['cart', tableId, userId] })
+      }
+      // ==========================================
     },
     onError: (err, variables) => {
       /* ... xử lý lỗi, chuyển hướng login nếu 401 ... */
@@ -132,6 +140,8 @@ const CategoryPage = () => {
     return <p className="text-center mt-10">Đang chuyển đến trang đăng nhập...</p>
   }
 
+  if (isLoading) return <p>Loading...</p>
+  if (error) return <p>Error: {error.message}</p>
   return (
     <div className="px-4 md:px-8">
       {/* Banner */}

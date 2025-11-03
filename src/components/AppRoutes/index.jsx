@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import AdminLayout from '@/layouts/AdminLayout'
 import DefaultLayout from '@/layouts/DefaultLayout'
@@ -12,6 +12,8 @@ import FoodDetailPage from '@/pages/client/FoodDetailPage'
 import OrderPage from '@/pages/client/OrderPage'
 import Login from '@/pages/client/Login'
 import Register from '@/pages/client/Register'
+import OrderDetail from '@/pages/client/OrderDetail'
+
 // Admin pages
 import CategoryManagement from '@/pages/admin/CategoryManagement'
 import DishManagement from '@/pages/admin/DishManagement'
@@ -21,6 +23,7 @@ import PaymentAndBill from '@/pages/admin/PaymentAndBill'
 import ReviewManagement from '@/pages/admin/ReviewManagement'
 import StaffManagement from '@/pages/admin/StaffManagement'
 import UserManagement from '@/pages/admin/UserManagement'
+import ContactPage from '@/pages/client/Contact/ContactPage'
 
 const AppRoutes = () => {
   return (
@@ -38,6 +41,7 @@ const AppRoutes = () => {
           <Route path="staffs" element={<StaffManagement />} />
           <Route path="users" element={<UserManagement />} />
         </Route>
+
         {/* Default layout pages */}
         <Route element={<DefaultLayout />}>
           <Route path="/" element={<Home />} />
@@ -45,9 +49,11 @@ const AppRoutes = () => {
           <Route path="/category" element={<CategoryPage />} />
           <Route path="/product/:id" element={<FoodDetailPage />} />
           <Route path="/cart" element={<CartPage />} />
-          <Route path="/order" element={<OrderPage />} />
+          <Route path="/order/:tableId" element={<OrderPage />} />{' '}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/orders/:id" element={<OrderDetail />} />
+          <Route path="/contact" element={<ContactPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
