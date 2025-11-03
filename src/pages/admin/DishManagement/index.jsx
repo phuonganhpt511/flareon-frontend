@@ -137,7 +137,7 @@ const DishManagement = () => {
   }
 
   return (
-    <>
+    <div className="h-full overflow-auto">
       <section className="mb-3">
         <h1 className="font-bold text-3xl mb-2">Quản lý món ăn</h1>
         <Breadcrumb items={[{ title: 'Trang chủ' }, { title: 'Quản lý món ăn' }]} />
@@ -167,7 +167,7 @@ const DishManagement = () => {
         onOk={handleOk}
         onCancel={closeModal}
       />
-    </>
+    </div>
   )
 }
 

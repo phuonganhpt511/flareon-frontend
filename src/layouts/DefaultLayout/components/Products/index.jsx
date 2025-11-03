@@ -55,7 +55,7 @@ const Products = () => {
   }
   const handleViewDetails = (productId) => {
     console.log('Chuyển đến chi tiết sản phẩm:', productId)
-    navigate(`/product/${productId}`) // Chuyển trang
+    navigate(`product/${productId}`) // Chuyển trang
   }
 
   // --- RENDER GIAO DIỆN VỚI DỮ LIỆU THẬT ---

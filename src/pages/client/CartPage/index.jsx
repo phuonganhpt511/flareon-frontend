@@ -4,6 +4,7 @@ import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query' //
 import http from '@/apis/http'
 import { useNavigate } from 'react-router'
 import CartItem from './CartItem'
+import Checkout from '@/components/Checkout'
 
 const CartPage = () => {
   // --- Lấy ID từ localStorage ---

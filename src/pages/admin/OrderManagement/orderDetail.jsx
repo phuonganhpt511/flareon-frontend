@@ -1,16 +1,32 @@
 import React from 'react'
-import { Modal, Descriptions, Tag, Table, Typography, Button, Divider } from 'antd'
-// Import useEffect không cần thiết vì ta không dùng form hook
+import { Modal, Descriptions, Tag, Table, Typography, Button, Divider, Select, Space, message } from 'antd'
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import http from '@/apis/http'; // 👈 Đảm bảo import này đúng
 
-const { Title } = Typography
+const { Title } = Typography;
 
-// --- 1. ĐỊNH NGHĨA CỘT CHO BẢNG MÓN ĂN ---
-const itemColumns = [
+// Định nghĩa các trạng thái món ăn có thể chọn
+const STATUS_OPTIONS = [
+  { value: 'Pending', label: 'Pending' },
+  { value: 'Processing', label: 'Processing' },
+  { value: 'Ready', label: 'Ready' },
+  { value: 'Served', label: 'Served' },
+  { value: 'Cancelled', label: 'Cancelled' },
+];
+
+// Hàm API Frontend để gọi PATCH
+const updateOrderItemStatusAPI = async ({ id, status }) => {
+  // Sử dụng đường dẫn API đã xác nhận: PATCH /order-item/{id}/status
+  return await http.patch(`/order-item/${id}/status`, { status });
+};
+
+// --- LOGIC CỘT (SỬ DỤNG TRONG COMPONENT) ---
+const itemColumns = (updateStatus, isUpdating) => [
   {
     title: 'Món ăn',
-    dataIndex: 'dish_name',
+    dataIndex: 'dish_id',
     key: 'dish_name',
-    render: (text) => <span className="font-medium">{text}</span>,
+    render: (dish) => <span className="font-medium">{dish?.dish_name}</span>,
   },
   {
     title: 'Số lượng',
@@ -21,106 +37,125 @@ const itemColumns = [
     title: 'Trạng thái món',
     dataIndex: 'status',
     key: 'status',
-    render: (status) => {
-      const colorMap = {
-        Prepared: 'green',
-        InProgress: 'blue',
-        Pending: 'gold',
-      };
-      return <Tag color={colorMap[status] || 'default'}>{status || 'Chờ làm'}</Tag>;
+    width: 150, // Cố định chiều rộng cho Select
+    // 💥 SỬA ĐỔI: Dùng Select để cập nhật trạng thái 💥
+    render: (currentStatus, record) => {
+      // Kiểm tra xem món ăn đã hoàn thành/hủy chưa
+      const isFinalized = currentStatus === 'Cancelled' || currentStatus === 'Served';
+
+      return (
+        <Select
+          value={currentStatus}
+          style={{ width: '100%' }}
+          // Khóa Select nếu món đã hoàn thành/hủy hoặc đang cập nhật
+          disabled={isFinalized || isUpdating}
+          // Gọi hàm cập nhật khi trạng thái thay đổi
+          onChange={(newStatus) => updateStatus({ id: record._id, status: newStatus })}
+          options={STATUS_OPTIONS}
+        />
+      );
     },
   },
   {
     title: 'Giá',
-    dataIndex: 'price',
+    dataIndex: 'dish_id',
     key: 'price',
-    render: (price) => `${(price ?? 0).toLocaleString('vi-VN')} đ`,
+    render: (dish, record) => {
+      const unitPrice = dish?.price ?? 0;
+      const price = unitPrice * (record.quantity ?? 0);
+      return `${(price).toLocaleString('vi-VN')} đ`;
+    },
   },
 ];
 
-const OrderModalDetail = ({ open, order, onCancel }) => {
-  // Tránh lỗi nếu order là null
-  if (!order) return null;
+const OrderModalDetail = ({ open, order, onCancel, orderItemsData, isLoadingItems }) => {
 
-  // --- LẤY DỮ LIỆU CẦN THIẾT ---
-  // Giả định order.items là mảng chi tiết các món ăn
-  const orderItems = order.items || [];
+  const queryClient = useQueryClient();
+  const [messageApi, contextHolder] = message.useMessage();
 
-  // Tính tổng tiền
-  const totalAmount = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  // LẤY DỮ LIỆU TỪ PROP ĐÃ FETCH 
+  const orderItems = orderItemsData || [];
+  const orderId = order?._id;
+
+  // --- LOGIC CẬP NHẬT TRẠNG THÁI (useMutation) ---
+  const { mutate: updateStatus, isPending: isUpdating } = useMutation({
+    mutationFn: updateOrderItemStatusAPI,
+    onSuccess: (response) => {
+      message.success(`Cập nhật trạng thái thành công: ${response.message || ''}`);
+
+      // ✅ Bắt buộc phải invalidate cache để tải lại dữ liệu
+      queryClient.invalidateQueries({ queryKey: ['orderItems', orderId] });
+      // Vô hiệu hóa cache danh sách Orders (vì trạng thái tổng có thể thay đổi)
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+    onError: (error) => {
+      const errorMsg = error.response?.data?.message || 'Lỗi: Không thể chuyển trạng thái (Quy tắc nghiệp vụ).';
+      message.error(errorMsg);
+      console.error('Lỗi chuyển trạng thái:', error.response?.data);
+    },
+  });
+
+  // Tính tổng tiền (giữ nguyên logic)
+  const totalAmount = orderItems.reduce((sum, item) =>
+    sum + ((item.dish_id?.price ?? 0) * (item.quantity ?? 0)),
+    0);
 
   // Định nghĩa màu cho trạng thái tổng của đơn hàng
   const orderStatusColorMap = {
-    Pending: 'gold',
-    Processing: 'blue',
-    Shipped: 'purple',
-    Completed: 'green',
-    Cancelled: 'red',
+    Pending: 'gold', Processing: 'blue', Shipped: 'purple', Completed: 'green', Cancelled: 'red',
   };
 
+  if (!order) return null;
+
   return (
-    <Modal
-      title={<Title level={4} className="!mb-0">Chi tiết đơn hàng #{order._id?.slice(-6)}</Title>}
-      open={open}
-      onCancel={onCancel}
-      footer={[
-        <Button key="close" onClick={onCancel}>
-          Đóng
-        </Button>
-      ]}
-      width={750} // Tăng chiều rộng để hiển thị bảng tốt hơn
-    >
-      {/* --- 2. PHẦN THÔNG TIN CHUNG (Dùng Descriptions thay cho Form) --- */}
-      <Descriptions bordered column={2} size="small" className="mb-4">
-        <Descriptions.Item label="Mã đơn hàng" span={2}>
-          <span className="font-medium">{order._id}</span>
-        </Descriptions.Item>
+    <>
+      {contextHolder} {/* Đảm bảo contextHolder được đặt ở đây */}
+      <Modal
+        title={<Title level={4} className="!mb-0">Chi tiết đơn hàng #{order._id?.slice(-6)}</Title>}
+        open={open}
+        onCancel={onCancel}
+        footer={[
+          <Button key="close" onClick={onCancel}>Đóng</Button>
+        ]}
+        width={750}
+      >
+        {/* --- 2. PHẦN THÔNG TIN CHUNG (Dùng Descriptions thay cho Form) --- */}
+        <Descriptions bordered column={2} size="small" className="mb-4">
+          <Descriptions.Item label="Mã đơn hàng" span={2}><span className="font-medium">{order._id}</span></Descriptions.Item>
+          <Descriptions.Item label="Khách hàng">{order.user?.username || order.user_id?.username || 'Khách lẻ'}</Descriptions.Item>
+          <Descriptions.Item label="Bàn">{order.table?.table_name || order.table_id?.table_name || 'Không có'}</Descriptions.Item>
+          <Descriptions.Item label="Trạng thái">
+            <Tag color={orderStatusColorMap[order.status] || 'default'} style={{ fontWeight: 'bold' }}>{order.status}</Tag>
+          </Descriptions.Item>
+          <Descriptions.Item label="Tổng tiền">
+            <span className="font-bold text-lg text-orange-500">{totalAmount.toLocaleString('vi-VN')} đ</span>
+          </Descriptions.Item>
+          <Descriptions.Item label="Thời gian tạo">{new Date(order.createdAt).toLocaleString()}</Descriptions.Item>
+          <Descriptions.Item label="Cập nhật cuối">{new Date(order.updatedAt).toLocaleString()}</Descriptions.Item>
+        </Descriptions>
 
-        <Descriptions.Item label="Khách hàng">
-          {order.user?.username || order.user_id?.username || 'Khách lẻ'}
-        </Descriptions.Item>
+        {/* --- 3. PHẦN DANH SÁCH MÓN ĂN (Sử dụng Table) --- */}
+        <Divider orientation="left" className="!mt-2 !mb-4">
+          <Title level={5} className="!mb-0">Danh sách món ăn và Trạng thái phục vụ</Title>
+        </Divider>
 
-        <Descriptions.Item label="Bàn">
-          {order.table?.table_name || order.table_id?.table_name || 'Không có'}
-        </Descriptions.Item>
-
-        <Descriptions.Item label="Trạng thái">
-          <Tag color={orderStatusColorMap[order.status] || 'default'} style={{ fontWeight: 'bold' }}>
-            {order.status}
-          </Tag>
-        </Descriptions.Item>
-
-        <Descriptions.Item label="Tổng tiền">
-          <span className="font-bold text-lg text-orange-500">
-            {totalAmount.toLocaleString('vi-VN')} đ
-          </span>
-        </Descriptions.Item>
-
-        <Descriptions.Item label="Thời gian tạo">
-          {new Date(order.createdAt).toLocaleString()}
-        </Descriptions.Item>
-        <Descriptions.Item label="Cập nhật cuối">
-          {new Date(order.updatedAt).toLocaleString()}
-        </Descriptions.Item>
-      </Descriptions>
-
-      {/* --- 3. PHẦN DANH SÁCH MÓN ĂN (Sử dụng Table) --- */}
-      <Divider orientation="left" className="!mt-2 !mb-4">
-        <Title level={5} className="!mb-0">Danh sách món ăn và Trạng thái phục vụ</Title>
-      </Divider>
-
-      <Table
-        columns={itemColumns}
-        dataSource={orderItems}
-        // Giả định mỗi item có id món ăn (dish_id)
-        rowKey={(record, index) => record.dish_id || index}
-        pagination={false}
-        size="middle"
-        locale={{ emptyText: 'Đơn hàng chưa có món ăn nào.' }}
-      />
-
-    </Modal>
-  )
+        {isLoadingItems ? (
+          <p className="text-center text-blue-500">Đang tải chi tiết món ăn...</p>
+        ) : (
+          <Table
+            // Truyền hàm updateStatus và trạng thái updating vào columns
+            columns={itemColumns(updateStatus, isUpdating)}
+            dataSource={orderItems}
+            rowKey={(record) => record._id || record.dish_id?._id}
+            pagination={false}
+            size="middle"
+            locale={{ emptyText: 'Đơn hàng chưa có món ăn nào.' }}
+            loading={isUpdating} // Hiển thị loading cho toàn bộ bảng khi gửi request cập nhật
+          />
+        )}
+      </Modal>
+    </>
+  );
 }
 
-export default OrderModalDetail
+export default OrderModalDetail;

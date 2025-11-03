@@ -1,44 +1,48 @@
-import React from 'react'
-import { Form, Input, Button, message, Typography } from 'antd' // 1. Import component từ Ant Design
-import { Mail, Phone, MapPin } from 'lucide-react' // 2. Import icons
-import { useMutation } from '@tanstack/react-query' // 3. Import useMutation
-import http from '@/apis/http' // 4. Import http client
+// src/pages/client/ContactPage.jsx
+import React, { useState } from 'react'
+import { Form, Input, Button, message, Typography } from 'antd'
+import { Mail, Phone, MapPin } from 'lucide-react'
+import emailjs from 'emailjs-com' // Import EmailJS
 
 const { Title, Text } = Typography
 
 const ContactPage = () => {
-  const [form] = Form.useForm() // Hook để quản lý form
-  const [messageApi, contextHolder] = message.useMessage() // Hook để hiển thị thông báo
+  const [form] = Form.useForm()
+  const [messageApi, contextHolder] = message.useMessage()
+  const [isLoading, setIsLoading] = useState(false)
 
-  // --- 5. TẠO MUTATION ĐỂ GỌI API GỬI LIÊN HỆ ---
-  // (Giả sử API là POST /contact)
-  const contactMutation = useMutation({
-    mutationFn: (formData) => {
-      // Bạn cần hỏi backend API chính xác là gì nhé
-      return http.post('/contact', formData)
-    },
-    onSuccess: (data) => {
-      console.log('Gửi liên hệ thành công:', data)
-      messageApi.success('Gửi tin nhắn thành công! Chúng tôi sẽ sớm phản hồi.')
-      form.resetFields() // Xóa rỗng form sau khi gửi
-    },
-    onError: (error) => {
-      console.error('Lỗi gửi liên hệ:', error)
-      const errMsg = error.response?.data?.message || 'Gửi tin nhắn thất bại. Vui lòng thử lại.'
-      messageApi.error(errMsg)
-    },
-  })
-
-  // --- 6. HÀM XỬ LÝ KHI SUBMIT FORM ---
+  // --- HÀM XỬ LÝ KHI SUBMIT FORM (Dùng EmailJS) ---
   const onFinish = (values) => {
     console.log('Thông tin liên hệ:', values)
-    // 'values' sẽ có dạng { name: '...', email: '...', subject: '...', message: '...' }
-    contactMutation.mutate(values)
+    setIsLoading(true) // Bật loading
+
+    // GỌI HÀM emailjs.send() VỚI CÁC "CHÌA KHÓA" CỦA BẠN
+    emailjs
+      .send(
+        'service_j8cxu7l', // <-- Service ID
+        'template_q7yxy3l', // <-- Template ID
+        values, // Dữ liệu form (khớp với {{name}}, {{email}}...)
+        'nmh7s617G2tYkFFyP' // <-- Public Key
+      )
+      .then(
+        (result) => {
+          console.log('Gửi EmailJS thành công!', result.text)
+          messageApi.success('Gửi tin nhắn thành công! Chúng tôi sẽ sớm phản hồi.')
+          form.resetFields()
+          setIsLoading(false)
+        },
+        (error) => {
+          console.error('Lỗi khi gửi EmailJS:', error.text)
+          messageApi.error('Gửi tin nhắn thất bại. Vui lòng thử lại.')
+          setIsLoading(false)
+        }
+      )
   }
 
   return (
     <div className="bg-white py-12 md:py-20 px-4">
-      {contextHolder} {/* Dùng để hiển thị thông báo messageApi */}
+      {contextHolder}
+
       {/* === PHẦN TIÊU ĐỀ === */}
       <div className="max-w-7xl mx-auto text-center mb-12 md:mb-16">
         <span className="inline-block bg-orange-100 text-orange-600 px-4 py-2 rounded-full mb-4 font-semibold text-sm">
@@ -51,6 +55,7 @@ const ContactPage = () => {
           Bạn có câu hỏi hoặc góp ý? Chúng tôi luôn sẵn lòng lắng nghe!
         </Text>
       </div>
+
       {/* === PHẦN NỘI DUNG (CHIA 2 CỘT) === */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* === CỘT 1: THÔNG TIN LIÊN HỆ === */}
@@ -103,14 +108,14 @@ const ContactPage = () => {
             {/* Tên và Email (2 cột) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
               <Form.Item
-                name="name"
+                name="name" // Phải khớp với {{name}}
                 label="Tên của bạn"
                 rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
               >
                 <Input size="large" placeholder="Nhập tên của bạn" className="!rounded-lg !py-3" />
               </Form.Item>
               <Form.Item
-                name="email"
+                name="email" // Phải khớp với {{email}}
                 label="Email"
                 rules={[
                   { required: true, message: 'Vui lòng nhập email!' },
@@ -127,7 +132,7 @@ const ContactPage = () => {
 
             {/* Chủ đề */}
             <Form.Item
-              name="subject"
+              name="subject" // Phải khớp với {{subject}}
               label="Chủ đề"
               rules={[{ required: true, message: 'Vui lòng nhập chủ đề!' }]}
             >
@@ -140,7 +145,7 @@ const ContactPage = () => {
 
             {/* Tin nhắn */}
             <Form.Item
-              name="message"
+              name="message" // Phải khớp với {{message}}
               label="Tin nhắn"
               rules={[{ required: true, message: 'Vui lòng nhập nội dung!' }]}
             >
@@ -152,16 +157,16 @@ const ContactPage = () => {
               />
             </Form.Item>
 
-            {/* Nút Gửi (Style cam giống Flareon) */}
+            {/* Nút Gửi */}
             <Form.Item>
               <Button
                 type="primary"
                 htmlType="submit"
                 size="large"
                 className="!h-14 !rounded-lg !text-xl !font-bold !bg-orange-500 hover:!bg-orange-600 !border-none w-full"
-                loading={contactMutation.isPending} // Nút xoay khi đang gửi
+                loading={isLoading}
               >
-                {contactMutation.isPending ? 'Đang gửi...' : 'Gửi tin nhắn'}
+                {isLoading ? 'Đang gửi...' : 'Gửi tin nhắn'}
               </Button>
             </Form.Item>
           </Form>
