@@ -26,6 +26,7 @@ const DishManagement = () => {
     queryKey: dishKeys.list(),
     queryFn: async () => {
       const res = await dishAPI.getAll()
+      console.log(res)
       return res.data || []
     },
     onError: () => toast.error('Không thể tải món ăn, vui lòng thử lại!'),

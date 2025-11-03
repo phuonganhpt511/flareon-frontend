@@ -1,8 +1,10 @@
+// TRONG FILE OrderModalEdit.jsx
+
 import React, { useEffect } from 'react'
 import { Modal, Form, Select, message } from 'antd'
 
 const OrderModalEdit = ({ open, order, onCancel, onSubmit }) => {
-  const [form] = Form.useForm()
+  const [form] = Form.useForm() // Khởi tạo form instance
   const [messageApi, contextHolder] = message.useMessage()
 
   const success = () => {
@@ -39,7 +41,7 @@ const OrderModalEdit = ({ open, order, onCancel, onSubmit }) => {
         okText="Lưu"
         cancelText="Hủy"
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout="vertical"> {/* 👈 ĐÃ THÊM form={form} */}
           <Form.Item
             name="status"
             label="Trạng thái"

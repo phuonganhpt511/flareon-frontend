@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import { Card, Table, Tag, Breadcrumb, Space, Button, Select, Input, message, Modal } from 'antd'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import http from '@/apis/http'
+import http from '@/apis/http' // Đây là instance có interceptor
+import orderAPI from '@/apis/order/order.api'
+import axios from 'axios' // 💥 BỔ SUNG: Import axios để gọi API không qua interceptor
 import {
   DeleteOutlined,
   EditOutlined,
@@ -14,6 +16,31 @@ import {
 import OrderModalEdit from './modalEdit'
 import OrderModalDetail from './orderDetail'
 
+// 💥 LOGIC API AN TOÀN: BỎ QUA INTERCEPTOR LỖI ĐỂ NHẬN PHẢN HỒI THÔ 💥
+const orderItemAPI = {
+  getOrderItemDetails: async (orderId) => {
+    try {
+      const token = localStorage.getItem('token')
+      const url = `${import.meta.env.VITE_API_URL || 'https://api-datn-orderfood-backend-2.onrender.com'}/order-item/order/${orderId}`
+
+      // ✅ GỌI AXIOS TRỰC TIẾP ĐỂ BỎ QUA INTERCEPTOR GÂY LỖI UNDEFINED
+      const response = await axios.get(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token ? `Bearer ${token}` : '', // Tự đính kèm token
+        },
+      })
+
+      // Trả về response.data (chứa {message, Orderitems}) nguyên vẹn
+      return response.data || {}
+    } catch (error) {
+      console.error('[API ERROR] Failed to fetch items:', error.response || error.message)
+      // Trả về đối tượng mặc định an toàn khi lỗi
+      return { data: [] }
+    }
+  },
+}
+
 const { Option } = Select
 const { confirm } = Modal
 
@@ -25,17 +52,20 @@ const OrderManagement = () => {
   const [searchText, setSearchtext] = useState('')
   const [messageApi, contextHolder] = message.useMessage()
 
+  // State để lưu ID đơn hàng cần xem chi tiết
+  const [detailOrderId, setDetailOrderId] = useState(null)
+
   const deleteSuccess = () => {
     messageApi.open({
       type: 'success',
-      content: 'Delete Success',
+      content: 'Xóa đơn hàng thành công!',
     })
   }
 
-  const deleteError = () => {
+  const deleteError = (errorMsg) => {
     messageApi.open({
       type: 'error',
-      content: 'Delete Success',
+      content: errorMsg || 'Xóa đơn hàng thất bại!',
     })
   }
 
@@ -54,17 +84,30 @@ const OrderManagement = () => {
       }
 
       const res = await http.get(url)
-      return res.data
+      return res.data || []
     },
     enabled: true,
   })
+
+  // GỌI API CHI TIẾT MÓN ĂN (Sẽ chạy khi detailOrderId thay đổi)
+  const { data: orderItemData, isLoading: isLoadingItems } = useQuery({
+    queryKey: ['orderItems', detailOrderId],
+    queryFn: async () => {
+      const res = await orderItemAPI.getOrderItemDetails(detailOrderId)
+      return res
+    },
+    // Chỉ chạy query này khi detailOrderId có giá trị
+    enabled: !!detailOrderId,
+    staleTime: 5 * 60 * 1000,
+  })
+
   const { mutate: updateOrder } = useMutation({
     mutationFn: async ({ id, data }) => {
       return await http.patch(`/orders/${id}`, data)
     },
     onSuccess: () => {
       message.success('Cập nhật đơn hàng thành công!')
-      queryClient.invalidateQueries(['orders'])
+      queryClient.invalidateQueries({ queryKey: ['orders'] })
     },
     onError: () => {
       message.error('Cập nhật thất bại!')
@@ -77,10 +120,28 @@ const OrderManagement = () => {
     },
     onSuccess: () => {
       deleteSuccess()
-      queryClient.invalidateQueries(['orders'])
+      queryClient.invalidateQueries({ queryKey: ['orders'] })
     },
-    onError: () => {
-      deleteError()
+    onError: (error) => {
+      console.error('Lỗi API DELETE Order:', error.response)
+
+      let errorMessage = 'Xóa đơn hàng thất bại.'
+      if (error.response) {
+        const status = error.response.status
+        const messageData = error.response.data?.message
+
+        if (status === 401 || status === 403) {
+          errorMessage = `Lỗi ${status} - Phân quyền: Bạn không có quyền xóa đơn hàng này.`
+        } else if (status === 404) {
+          errorMessage = 'Lỗi 404: Không tìm thấy đơn hàng.'
+        } else if (messageData) {
+          errorMessage = `Thất bại: ${messageData}`
+        } else {
+          errorMessage = `Lỗi Server: ${status}`
+        }
+      }
+
+      deleteError(errorMessage)
     },
   })
 
@@ -104,6 +165,7 @@ const OrderManagement = () => {
 
   const handleOpenDetailModal = (order) => {
     setSelectedOrder(order)
+    setDetailOrderId(order._id) // SET ID ĐỂ KÍCH HOẠT FETCH
     setModalDetailOpen(true)
   }
 
@@ -111,6 +173,7 @@ const OrderManagement = () => {
     setModalOpen(false)
     setModalDetailOpen(false)
     setSelectedOrder(null)
+    setDetailOrderId(null) // RESET ID KHI ĐÓNG MODAL
   }
 
   const columns = [
@@ -140,6 +203,7 @@ const OrderManagement = () => {
           Processing: 'blue',
           Completed: 'green',
           Cancelled: 'red',
+          Shipped: 'purple',
         }
         return <Tag color={colorMap[status] || 'default'}>{status}</Tag>
       },
@@ -148,16 +212,25 @@ const OrderManagement = () => {
       title: 'Action',
       key: 'action',
       render: (_, record) => {
-        if (record.status === 'Cancelled' || record.status === 'Complete') {
+        const isFinalized = record.status === 'Cancelled' || record.status === 'Completed'
+
+        if (isFinalized) {
           return (
             <Button
               type="primary"
               danger
               icon={<DeleteOutlined />}
               onClick={() => {
-                if (window.confirm('Xác nhận xóa ?')) {
-                  deleteOrder(record._id)
-                }
+                confirm({
+                  title: 'Xác nhận xóa?',
+                  content: `Bạn có chắc chắn muốn xóa đơn hàng #${record._id.slice(-6)} này không?`,
+                  okText: 'Xóa',
+                  okType: 'danger',
+                  cancelText: 'Hủy',
+                  onOk() {
+                    deleteOrder(record._id)
+                  },
+                })
               }}
             />
           )
@@ -180,8 +253,21 @@ const OrderManagement = () => {
     },
   ]
 
-  if (isLoading) return <p>Loading...</p>
-  if (error) return <p>Error: {error.message}</p>
+  if (isLoading) return <p>Đang tải đơn hàng...</p>
+  if (error) return <p>Lỗi: Không thể tải đơn hàng ({error.message})</p>
+
+  const tableData = Array.isArray(data) ? data : data?.data || []
+
+  // 💥 LOGIC LẤY MẢNG MÓN ĂN TỪ CÁC TRƯỜNG KHÁC NHAU (Đã sửa để thích nghi với phản hồi thô) 💥
+  const orderItems =
+    orderItemData && Array.isArray(orderItemData.data)
+      ? orderItemData.data
+      : orderItemData?.Orderitems && Array.isArray(orderItemData.Orderitems)
+        ? orderItemData.Orderitems
+        : orderItemData && Array.isArray(orderItemData)
+          ? orderItemData // Trường hợp Backend trả về mảng thô
+          : []
+
   return (
     <div className="h-full overflow-auto">
       {contextHolder}
@@ -233,17 +319,22 @@ const OrderManagement = () => {
         </div>
         <Table
           columns={columns}
-          dataSource={data}
+          dataSource={tableData}
           rowKey={'_id'}
           pagination={{ pageSize: 10 }}
           className="rounded-xl"
         />
       </Card>
+
       <OrderModalDetail
         order={selectedOrder}
         open={modalDetailOpen}
         onCancel={() => handleCancel()}
+        // TRUYỀN DỮ LIỆU ĐÃ FETCH VÀO PROP MỚI
+        orderItemsData={orderItems}
+        isLoadingItems={isLoadingItems}
       />
+
       <OrderModalEdit
         open={modalOpen}
         order={selectedOrder}
