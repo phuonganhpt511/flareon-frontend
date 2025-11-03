@@ -183,7 +183,7 @@ const OrderManagement = () => {
   if (isLoading) return <p>Loading...</p>
   if (error) return <p>Error: {error.message}</p>
   return (
-    <>
+    <div className="h-full overflow-auto">
       {contextHolder}
       <section className="mb-3">
         <h1 className="font-bold text-3xl mb-2">Quản lý đơn hàng</h1>
@@ -235,7 +235,7 @@ const OrderManagement = () => {
           columns={columns}
           dataSource={data}
           rowKey={'_id'}
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 10 }}
           className="rounded-xl"
         />
       </Card>
@@ -250,7 +250,7 @@ const OrderManagement = () => {
         onCancel={() => handleCancel()}
         onSubmit={(value) => handleUpdate(value, selectedOrder?._id)}
       />
-    </>
+    </div>
   )
 }
 

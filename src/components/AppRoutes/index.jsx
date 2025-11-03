@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router'
 
 import AdminLayout from '@/layouts/AdminLayout'
 import DefaultLayout from '@/layouts/DefaultLayout'
@@ -27,6 +27,7 @@ const AppRoutes = () => {
     <BrowserRouter>
       <Routes>
         {/* Admin layout pages */}
+        <Route path="/" element={<Navigate to="/flareon" replace />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="categories" element={<CategoryManagement />} />
@@ -39,15 +40,15 @@ const AppRoutes = () => {
           <Route path="users" element={<UserManagement />} />
         </Route>
         {/* Default layout pages */}
-        <Route element={<DefaultLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/category" element={<CategoryPage />} />
-          <Route path="/product/:id" element={<FoodDetailPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/order" element={<OrderPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+        <Route path="/flareon" element={<DefaultLayout />}>
+          <Route index element={<Home />} />
+          <Route path="about" element={<AboutPage />} />
+          <Route path="category" element={<CategoryPage />} />
+          <Route path="product/:id" element={<FoodDetailPage />} />
+          <Route path="cart" element={<CartPage />} />
+          <Route path="order" element={<OrderPage />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
         </Route>
       </Routes>
     </BrowserRouter>

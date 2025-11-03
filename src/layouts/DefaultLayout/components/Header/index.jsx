@@ -29,25 +29,26 @@ const Header = () => {
               Tính năng
             </NavLink>
             <NavLink
-              to="/categories"
+              to="category"
               className="text-gray-700 hover:text-orange-500 transition-colors"
             >
               Danh mục
             </NavLink>
-            <NavLink to="/dishes" className="text-gray-700 hover:text-orange-500 transition-colors">
+            <NavLink to="dishes" className="text-gray-700 hover:text-orange-500 transition-colors">
               Món ăn
             </NavLink>
-            <NavLink
-              to="/contact"
-              className="text-gray-700 hover:text-orange-500 transition-colors"
-            >
+            <NavLink to="contact" className="text-gray-700 hover:text-orange-500 transition-colors">
               Liên hệ
             </NavLink>
           </div>
 
           <div className="hidden md:flex items-center gap-4">
-            <AntButton type="primary">Đăng nhập</AntButton>
-            <AntButton>Đăng ký</AntButton>
+            <NavLink to="login">
+              <AntButton type="primary">Đăng nhập</AntButton>
+            </NavLink>
+            <NavLink to="register">
+              <AntButton>Đăng Ký</AntButton>
+            </NavLink>
           </div>
 
           <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>

@@ -1,5 +1,5 @@
-import { Eye, Star, Clock } from "lucide-react";
-import { Tag, Button } from "antd";
+import { Eye, Star, Clock } from 'lucide-react'
+import { Tag, Button } from 'antd'
 
 const products = [
   {
@@ -134,6 +134,7 @@ const Products = () => {
                     <span className="text-2xl text-orange-500">
                       {product.price.toLocaleString('vi-VN')}đ
                     </span>
+
                     <Button
                       variant="outline"
                       className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"

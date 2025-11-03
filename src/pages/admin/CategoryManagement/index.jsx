@@ -131,7 +131,7 @@ const CategoryManagement = () => {
   }
 
   return (
-    <>
+    <div className="h-full overflow-auto">
       <section className="mb-3">
         <h1 className="font-bold text-3xl mb-2">Quản lý danh mục</h1>
         <Breadcrumb items={[{ title: 'Trang chủ' }, { title: 'Quản lý danh mục' }]} />
@@ -161,7 +161,7 @@ const CategoryManagement = () => {
         onOk={handleOk}
         onCancel={closeModal}
       />
-    </>
+    </div>
   )
 }
 

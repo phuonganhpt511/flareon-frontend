@@ -1,5 +1,6 @@
 import React from 'react'
 import CartItem from './CartItem'
+import Checkout from '@/components/Checkout'
 
 const CartPage = () => {
   return (
@@ -22,9 +23,10 @@ const CartPage = () => {
           <span className="font-semibold text-orange-600 text-lg">100.000 đ</span>
         </div>
         <div className="flex justify-center">
-          <button className="w-[340px] h-[48px] bg-orange-500 text-white rounded-lg font-semibold text-lg flex items-center justify-center hover:bg-orange-600 transition mt-2">
+          {/* <button className="w-[340px] h-[48px] bg-orange-500 text-white rounded-lg font-semibold text-lg flex items-center justify-center hover:bg-orange-600 transition mt-2">
             Xác nhận
-          </button>
+          </button> */}
+          <Checkout />
         </div>
       </div>
     </div>
