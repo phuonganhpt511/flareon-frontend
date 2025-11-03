@@ -1,7 +1,14 @@
+// AppRoutes.jsx
+
+// LƯU Ý: Đảm bảo bạn đã cài đặt react-router-dom và sửa import từ 'react-router' thành 'react-router-dom'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import AdminLayout from '@/layouts/AdminLayout'
 import DefaultLayout from '@/layouts/DefaultLayout'
+
+// 👈 IMPORT CÁC COMPONENT BẢO VỆ MỚI
+import { ProtectedRoute, AuthRedirect } from '@/components/ProtectedRoute'
+
 // Client pages
 import Home from '@/pages/client/Home'
 import AboutPage from '@/pages/client/AboutPage'
@@ -10,9 +17,10 @@ import CategoryPage from '@/pages/client/CategoryPage'
 import CartPage from '@/pages/client/CartPage'
 import FoodDetailPage from '@/pages/client/FoodDetailPage'
 import OrderPage from '@/pages/client/OrderPage'
+import OrderDetailPage from '@/pages/client/OrderDetailPage'
 import Login from '@/pages/client/Login'
 import Register from '@/pages/client/Register'
-import OrderDetail from '@/pages/client/OrderDetail' 
+
 
 // Admin pages
 import CategoryManagement from '@/pages/admin/CategoryManagement'
@@ -24,8 +32,10 @@ import ReviewManagement from '@/pages/admin/ReviewManagement'
 import StaffManagement from '@/pages/admin/StaffManagement'
 import UserManagement from '@/pages/admin/UserManagement'
 
+
 const AppRoutes = () => {
   return (
+    // LƯU Ý QUAN TRỌNG: Component này phải nằm trong <AuthProvider> ở file App.jsx
     <BrowserRouter>
       <Routes>
         {/* Admin layout pages */}
@@ -47,11 +57,20 @@ const AppRoutes = () => {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/category" element={<CategoryPage />} />
           <Route path="/product/:id" element={<FoodDetailPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/order/:tableId" element={<OrderPage />} />{' '}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/orders/:id" element={<OrderDetail />} /> 
+
+          {/* 💥 BẢO VỆ CÁC TRANG CẦN ĐĂNG NHẬP 💥 */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/orders" element={<OrderPage />} />
+            <Route path="/order/:id" element={<OrderDetailPage />} />
+          </Route>
+
+          {/* 💥 CHUYỂN HƯỚNG NẾU ĐÃ ĐĂNG NHẬP (Chặn truy cập Login/Register) 💥 */}
+          <Route element={<AuthRedirect />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
+
         </Route>
       </Routes>
     </BrowserRouter>

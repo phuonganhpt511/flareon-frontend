@@ -1,10 +1,12 @@
 import React from 'react'
 import { Button, Input, Form, Typography, Divider, notification } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
-// 1. IMPORT THƯ VIỆN CẦN THIẾT
+
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import authAPI from '@/apis/auth/auth.api' // Đảm bảo đường dẫn đúng
+import authAPI from '@/apis/auth/auth.api'
+// 👈 1. IMPORT HOOK useAuth
+import { useAuth } from '@/contexts/AuthContext'
 
 const { Title, Text, Link } = Typography
 
@@ -15,6 +17,9 @@ const Login = () => {
   const navigate = useNavigate()
   const [form] = Form.useForm()
 
+  // 👈 2. SỬ DỤNG useAuth ĐỂ LẤY HÀM login()
+  const { login } = useAuth();
+
   // --- LOGIC GỌI API ĐĂNG NHẬP ---
   const loginMutation = useMutation({
     mutationFn: (payload) => authAPI.login(payload),
@@ -22,18 +27,14 @@ const Login = () => {
     onSuccess: (data) => {
       // Giả định Backend trả về: { token: '...', user: { _id: '...', ... } }
       const token = data.token || data.accessToken;
-      const userObject = data.user; // Lấy toàn bộ đối tượng user
+      const userObject = data.user;
 
-      if (token && userObject && userObject._id) { // Kiểm tra token và user object hợp lệ
-        // 1. LƯU TOKEN
-        localStorage.setItem('token', token);
+      if (token && userObject && userObject._id) {
 
-        // 2. ✅ SỬA: LƯU TOÀN BỘ OBJECT USER (DƯỚI DẠNG CHUỖI JSON) VÀO KEY 'user'
-        //    Điều này khớp với logic mà hàm handleAddToCart đang tìm kiếm
-        localStorage.setItem('user', JSON.stringify(userObject));
-
-        // ⚠️ Xóa userId riêng để tránh nhầm lẫn (có thể bỏ qua nếu bạn không lưu userId riêng ở đâu khác)
-        localStorage.removeItem('userId');
+        // 💥 3. BỎ QUA VIỆC LƯU LOCAL STORAGE TRỰC TIẾP 💥
+        // Thay vào đó, gọi hàm login() từ Context.
+        // Hàm này sẽ tự động lưu Local Storage VÀ cập nhật trạng thái isLoggedIn = true.
+        login(token, userObject);
 
         notification.success({
           message: 'Đăng nhập thành công! 🎉',
@@ -51,12 +52,26 @@ const Login = () => {
         });
       }
     },
-
+    // TRONG component Login, thay thế hàm onError này:
     onError: (error) => {
-      console.error('Lỗi đăng nhập:', error.response?.data)
-      const message = error.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.';
+      // Log toàn bộ lỗi để kiểm tra cấu trúc
+      console.error('LỖI ĐĂNG NHẬP (CHI TIẾT):', error);
+      // Log nội dung phản hồi lỗi từ server
+      console.error('SERVER RESPONSE DATA:', error.response?.data); // <--- Lỗi chi tiết nằm ở đây
+
+      // Lấy thông báo lỗi từ server (thường là trường 'message' hoặc 'error')
+      const serverMessage = error.response?.data?.message
+        || error.response?.data?.error
+        || 'Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.';
+
+      // Mã lỗi HTTP
+      const serverStatus = error.response?.status;
+
+      // Thiết lập thông báo hiển thị cho người dùng
+      const message = serverMessage;
+
       notification.error({
-        message: 'Lỗi Đăng nhập',
+        message: `Lỗi Đăng nhập (${serverStatus || 'Lỗi Mạng/Client'})`,
         description: message,
         placement: 'topRight',
       });
@@ -66,13 +81,14 @@ const Login = () => {
   // 3. Hàm xử lý sự kiện submit form
   const onFinish = (values) => {
     const payload = {
-      email: values.email, // Gửi email
-      password: values.password, // Gửi mật khẩu
+      email: values.email,
+      password: values.password,
     }
     loginMutation.mutate(payload)
   }
 
   return (
+    // ... (Phần JSX giữ nguyên)
     <div className="flex flex-col items-center justify-start min-h-screen bg-white">
       <header className="w-full flex justify-between items-center p-4">
         <Link
