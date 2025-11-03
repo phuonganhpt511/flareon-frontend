@@ -115,7 +115,7 @@ export default function Dashboard() {
   ]
 
   return (
-    <>
+    <div className="h-full overflow-auto">
       <section className="mb-3">
         <h1 className="font-bold text-3xl mb-2">Trang tổng quan</h1>
         <Breadcrumb items={[{ title: 'Trang chủ' }, { title: 'Trang tổng quan' }]} />
@@ -218,6 +218,6 @@ export default function Dashboard() {
           </Card>
         </div>
       </div>
-    </>
+    </div>
   )
 }

@@ -1,12 +1,8 @@
-// AppRoutes.jsx
-
-// LƯU Ý: Đảm bảo bạn đã cài đặt react-router-dom và sửa import từ 'react-router' thành 'react-router-dom'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router'
 
 import AdminLayout from '@/layouts/AdminLayout'
 import DefaultLayout from '@/layouts/DefaultLayout'
 
-// 👈 IMPORT CÁC COMPONENT BẢO VỆ MỚI
 import { ProtectedRoute, AuthRedirect } from '@/components/ProtectedRoute'
 
 // Client pages
@@ -21,7 +17,6 @@ import OrderDetailPage from '@/pages/client/OrderDetailPage'
 import Login from '@/pages/client/Login'
 import Register from '@/pages/client/Register'
 
-
 // Admin pages
 import CategoryManagement from '@/pages/admin/CategoryManagement'
 import DishManagement from '@/pages/admin/DishManagement'
@@ -32,13 +27,13 @@ import ReviewManagement from '@/pages/admin/ReviewManagement'
 import StaffManagement from '@/pages/admin/StaffManagement'
 import UserManagement from '@/pages/admin/UserManagement'
 
-
 const AppRoutes = () => {
   return (
     // LƯU Ý QUAN TRỌNG: Component này phải nằm trong <AuthProvider> ở file App.jsx
     <BrowserRouter>
       <Routes>
         {/* Admin layout pages */}
+        <Route path="/" element={<Navigate to="/flareon" replace />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="categories" element={<CategoryManagement />} />
@@ -51,26 +46,22 @@ const AppRoutes = () => {
           <Route path="users" element={<UserManagement />} />
         </Route>
 
-        {/* Default layout pages */}
-        <Route element={<DefaultLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/category" element={<CategoryPage />} />
-          <Route path="/product/:id" element={<FoodDetailPage />} />
+        <Route path="/flareon" element={<DefaultLayout />}>
+          <Route index element={<Home />} />
+          <Route path="about" element={<AboutPage />} />
+          <Route path="category" element={<CategoryPage />} />
+          <Route path="product/:id" element={<FoodDetailPage />} />
 
-          {/* 💥 BẢO VỆ CÁC TRANG CẦN ĐĂNG NHẬP 💥 */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/orders" element={<OrderPage />} />
-            <Route path="/order/:id" element={<OrderDetailPage />} />
+            <Route path="cart" element={<CartPage />} />
+            <Route path="orders" element={<OrderPage />} />
+            <Route path="order/:id" element={<OrderDetailPage />} />
           </Route>
 
-          {/* 💥 CHUYỂN HƯỚNG NẾU ĐÃ ĐĂNG NHẬP (Chặn truy cập Login/Register) 💥 */}
           <Route element={<AuthRedirect />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
           </Route>
-
         </Route>
       </Routes>
     </BrowserRouter>

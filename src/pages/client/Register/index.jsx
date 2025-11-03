@@ -4,7 +4,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons'
 
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import authAPI from '@/apis/auth/auth.api';
+import authAPI from '@/apis/auth/auth.api'
 
 const { Title, Text, Link } = Typography
 
@@ -16,7 +16,6 @@ const Register = () => {
   const navigate = useNavigate()
   const [form] = Form.useForm()
 
-
   const registerMutation = useMutation({
     mutationFn: (payload) => authAPI.register(payload),
 
@@ -26,18 +25,17 @@ const Register = () => {
         description: data.message || 'Vui lòng đăng nhập để tiếp tục.',
         placement: 'topRight',
       })
-      navigate('/login') 
+      navigate('login')
     },
 
     onError: (error) => {
- 
-      let displayMessage = 'Đăng ký thất bại. Lỗi không xác định.';
+      let displayMessage = 'Đăng ký thất bại. Lỗi không xác định.'
       if (error.response?.data?.message) {
         // Xử lý lỗi validation từ MongoDB/Mongoose
         if (error.response.data.message.includes('validation failed')) {
-          displayMessage = 'Lỗi thiếu thông tin bắt buộc: Tên đăng nhập hoặc Số điện thoại.';
+          displayMessage = 'Lỗi thiếu thông tin bắt buộc: Tên đăng nhập hoặc Số điện thoại.'
         } else {
-          displayMessage = error.response.data.message;
+          displayMessage = error.response.data.message
         }
       }
 
@@ -84,7 +82,6 @@ const Register = () => {
         </div>
 
         <Form form={form} layout="vertical" onFinish={onFinish}>
-
           {/* Trường Tên (Sử dụng 'name' nhưng gửi 'username' trong payload) */}
           <Form.Item
             name="name"
@@ -101,7 +98,7 @@ const Register = () => {
             name="phone"
             rules={[
               { required: true, message: 'Vui lòng nhập Số điện thoại!' },
-              { pattern: /^[0-9]+$/, message: 'Số điện thoại không hợp lệ!' }
+              { pattern: /^[0-9]+$/, message: 'Số điện thoại không hợp lệ!' },
             ]}
           >
             <Input
@@ -115,7 +112,7 @@ const Register = () => {
             name="email"
             rules={[
               { required: true, message: 'Vui lòng nhập Email!' },
-              { type: 'email', message: 'Email không đúng định dạng!' }
+              { type: 'email', message: 'Email không đúng định dạng!' },
             ]}
           >
             <Input
@@ -129,7 +126,7 @@ const Register = () => {
             name="password"
             rules={[
               { required: true, message: 'Vui lòng nhập Mật Khẩu!' },
-              { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' }
+              { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự!' },
             ]}
             hasFeedback
           >
@@ -149,9 +146,9 @@ const Register = () => {
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!value || getFieldValue('password') === value) {
-                    return Promise.resolve();
+                    return Promise.resolve()
                   }
-                  return Promise.reject(new Error('Hai mật khẩu không khớp!'));
+                  return Promise.reject(new Error('Hai mật khẩu không khớp!'))
                 },
               }),
             ]}
@@ -161,7 +158,6 @@ const Register = () => {
               className="!rounded-lg !h-14 !text-lg placeholder:!text-orange-500 !border-orange-500"
             />
           </Form.Item>
-
 
           {/* Nút Đăng Ký */}
           <Form.Item className="mt-6">
@@ -206,22 +202,24 @@ const Register = () => {
           </Button>
         </div>
 
-                <div className="text-center text-xs text-gray-500 mb-20 px-4 mt-10">
-                    <Text type="secondary" className="!text-gray-500 text-sm">
-                        Bằng cách đăng ký, bạn đồng ý với
-                        <Link href="/terms" className="!font-bold !text-gray-800 hover:!text-orange-500">
-                            {' '}Điều khoản dịch vụ{' '}
-                        </Link>
-                        và
-                        <br />
-                        <Link href="/privacy" className="!font-bold !text-gray-800 hover:!text-orange-500">
-                            {' '}Chính sách bảo mật
-                        </Link>
-                    </Text>
-                </div>
-            </div>
+        <div className="text-center text-xs text-gray-500 mb-20 px-4 mt-10">
+          <Text type="secondary" className="!text-gray-500 text-sm">
+            Bằng cách đăng ký, bạn đồng ý với
+            <Link href="/terms" className="!font-bold !text-gray-800 hover:!text-orange-500">
+              {' '}
+              Điều khoản dịch vụ{' '}
+            </Link>
+            và
+            <br />
+            <Link href="/privacy" className="!font-bold !text-gray-800 hover:!text-orange-500">
+              {' '}
+              Chính sách bảo mật
+            </Link>
+          </Text>
         </div>
-    )
+      </div>
+    </div>
+  )
 }
 
 export default Register
