@@ -7,11 +7,13 @@ import AntButton from '@/components/AntButton'
 import { useQuery } from '@tanstack/react-query' // <<<--- DÒNG IMPORT ĐÃ THÊM
 import http from '@/apis/http'
 import { UserOutlined } from '@ant-design/icons'
+import { useAuth } from '@/contexts/AuthContext'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const navigate = useNavigate()
+  const { isLoggedIn, user, logout } = useAuth()
 
   // --- LẤY ID VÀ DỮ LIỆU GIỎ HÀNG ---
   const mongoTableId = localStorage.getItem('currentTableId')
@@ -46,10 +48,10 @@ const Header = () => {
   // Hàm Đăng xuất
   const handleLogout = () => {
     localStorage.removeItem('user')
-    localStorage.removeItem('token')
+    localStorage.removeItem('userToken')
     localStorage.removeItem('currentTableId')
     localStorage.removeItem('currentQrCode')
-    window.location.href = '/flareon/login' // <<<--- SỬA LẠI ĐƯỜNG DẪN LOGIN
+    window.location.href = '/flareon/login'
   }
   // --- KẾT THÚC PHẦN LOGIC MỚI ---
 
@@ -102,7 +104,7 @@ const Header = () => {
     {
       key: 'logout',
       label: (
-        <span onClick={handleLogout} className="text-red-600 font-semibold">
+        <span onClick={logout} className="text-red-600 font-semibold">
           Đăng xuất
         </span>
       ),
