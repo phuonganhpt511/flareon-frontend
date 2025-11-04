@@ -26,6 +26,7 @@ import PaymentAndBill from '@/pages/admin/PaymentAndBill'
 import ReviewManagement from '@/pages/admin/ReviewManagement'
 import StaffManagement from '@/pages/admin/StaffManagement'
 import UserManagement from '@/pages/admin/UserManagement'
+import ContactPage from '@/pages/client/Contact/ContactPage'
 
 const AppRoutes = () => {
   return (
@@ -51,6 +52,7 @@ const AppRoutes = () => {
           <Route path="about" element={<AboutPage />} />
           <Route path="category" element={<CategoryPage />} />
           <Route path="product/:id" element={<FoodDetailPage />} />
+          <Route path="contact" element={<ContactPage />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="cart" element={<CartPage />} />

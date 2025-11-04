@@ -18,7 +18,7 @@ const Login = () => {
   const [form] = Form.useForm()
 
   // 👈 2. SỬ DỤNG useAuth ĐỂ LẤY HÀM login()
-  const { login } = useAuth();
+  const { login } = useAuth()
 
   // --- LOGIC GỌI API ĐĂNG NHẬP ---
   const loginMutation = useMutation({
@@ -26,55 +26,55 @@ const Login = () => {
 
     onSuccess: (data) => {
       // Giả định Backend trả về: { token: '...', user: { _id: '...', ... } }
-      const token = data.token || data.accessToken;
-      const userObject = data.user;
+      const token = data.token || data.accessToken
+      const userObject = data.user
 
       if (token && userObject && userObject._id) {
-
         // 💥 3. BỎ QUA VIỆC LƯU LOCAL STORAGE TRỰC TIẾP 💥
         // Thay vào đó, gọi hàm login() từ Context.
         // Hàm này sẽ tự động lưu Local Storage VÀ cập nhật trạng thái isLoggedIn = true.
-        login(token, userObject);
+        login(token, userObject)
 
         notification.success({
           message: 'Đăng nhập thành công! 🎉',
           description: 'Chào mừng trở lại! Đang chuyển hướng...',
           placement: 'topRight',
-        });
+        })
 
         // Chuyển hướng về trang chủ
-        navigate('/');
+        navigate('/')
       } else {
         notification.error({
           message: 'Lỗi Dữ liệu',
           description: 'Phản hồi từ máy chủ không chứa token hoặc ID người dùng hợp lệ.',
           placement: 'topRight',
-        });
+        })
       }
     },
     // TRONG component Login, thay thế hàm onError này:
     onError: (error) => {
       // Log toàn bộ lỗi để kiểm tra cấu trúc
-      console.error('LỖI ĐĂNG NHẬP (CHI TIẾT):', error);
+      console.error('LỖI ĐĂNG NHẬP (CHI TIẾT):', error)
       // Log nội dung phản hồi lỗi từ server
-      console.error('SERVER RESPONSE DATA:', error.response?.data); // <--- Lỗi chi tiết nằm ở đây
+      console.error('SERVER RESPONSE DATA:', error.response?.data) // <--- Lỗi chi tiết nằm ở đây
 
       // Lấy thông báo lỗi từ server (thường là trường 'message' hoặc 'error')
-      const serverMessage = error.response?.data?.message
-        || error.response?.data?.error
-        || 'Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.';
+      const serverMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        'Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.'
 
       // Mã lỗi HTTP
-      const serverStatus = error.response?.status;
+      const serverStatus = error.response?.status
 
       // Thiết lập thông báo hiển thị cho người dùng
-      const message = serverMessage;
+      const message = serverMessage
 
       notification.error({
         message: `Lỗi Đăng nhập (${serverStatus || 'Lỗi Mạng/Client'})`,
         description: message,
         placement: 'topRight',
-      });
+      })
     },
   })
 
@@ -109,12 +109,11 @@ const Login = () => {
         </div>
 
         <Form form={form} layout="vertical" onFinish={onFinish}>
-
           <Form.Item
             name="email" // Trường Email
             rules={[
               { required: true, message: 'Vui lòng nhập Email!' },
-              { type: 'email', message: 'Email không đúng định dạng!' }
+              { type: 'email', message: 'Email không đúng định dạng!' },
             ]}
           >
             <Input
@@ -177,31 +176,33 @@ const Login = () => {
           </Button>
         </div>
 
-                    <Button
-                        block
-                        size="large"
-                        icon={<img src={GL_Logo} alt="Google" className="h-6 mr-2" />}
-                        className="!h-14 !rounded-lg !text-lg !font-semibold !bg-gray-100 hover:!bg-gray-200"
-                    >
-                        Continue with Google
-                    </Button>
-                </div>
+        <Button
+          block
+          size="large"
+          icon={<img src={GL_Logo} alt="Google" className="h-6 mr-2" />}
+          className="!h-14 !rounded-lg !text-lg !font-semibold !bg-gray-100 hover:!bg-gray-200"
+        >
+          Continue with Google
+        </Button>
+      </div>
 
-                {/* Chính sách */}
-                <div className="text-center text-xs text-gray-500 mb-20 px-4 mt-10">
-                    <Text type="secondary" className="!text-gray-500 text-sm">
-                        Bằng cách tiếp tục, bạn đồng ý với
-                        <Link href="/terms" className="!font-bold !text-gray-800 hover:!text-orange-500">
-                            {' '}Điều khoản sử dụng{' '}
-                        </Link>
-                        và
-                        <Link href="/privacy" className="!font-bold !text-gray-800 hover:!text-orange-500">
-                            {' '}Chính sách bảo mật
-                        </Link>
-                    </Text>
-                </div>
-            </div>
-    )
+      {/* Chính sách */}
+      <div className="text-center text-xs text-gray-500 mb-20 px-4 mt-10">
+        <Text type="secondary" className="!text-gray-500 text-sm">
+          Bằng cách tiếp tục, bạn đồng ý với
+          <Link href="/terms" className="!font-bold !text-gray-800 hover:!text-orange-500">
+            {' '}
+            Điều khoản sử dụng{' '}
+          </Link>
+          và
+          <Link href="/privacy" className="!font-bold !text-gray-800 hover:!text-orange-500">
+            {' '}
+            Chính sách bảo mật
+          </Link>
+        </Text>
+      </div>
+    </div>
+  )
 }
 
 export default Login
