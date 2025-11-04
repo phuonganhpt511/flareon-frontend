@@ -77,7 +77,9 @@ const FoodDetailPage = () => {
       console.error(`Lỗi khi thêm '${variables.dishName}' vào giỏ:`, err)
       if (err.response?.status === 401) {
         alert('Vui lòng đăng nhập để thêm sản phẩm.')
-        navigate(`/login?redirect=${encodeURIComponent(location.pathname + location.search)}`)
+        navigate(
+          `/flareon/login?redirect=${encodeURIComponent(location.pathname + location.search)}`
+        )
       } else {
         const errMsg = err.response?.data?.message || 'Có lỗi xảy ra khi thêm vào giỏ.'
         alert(errMsg)
