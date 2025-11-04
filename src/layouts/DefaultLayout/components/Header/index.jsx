@@ -1,21 +1,59 @@
 // src/layouts/DefaultLayout/components/Header/index.jsx
-
-import { useState } from 'react'
+import React, { use, useState, useMemo } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Dropdown, Menu as AntMenu, Modal, List } from 'antd'
-import { FlameKindling, Menu, X, LogOut, User, Receipt } from 'lucide-react'
-//                                                        ^^^^^ Truck đã được thêm
-
+import { FlameKindling, Menu, X, Clock, ShoppingCart, User, Receipt, LogOut } from 'lucide-react' // Import các icon cần thiết
+import { Modal, List, Button, Badge, Avatar, Dropdown } from 'antd' // Import các component Antd
 import AntButton from '@/components/AntButton'
-import { useAuth } from '@/contexts/AuthContext'
+import { useQuery } from '@tanstack/react-query' // <<<--- DÒNG IMPORT ĐÃ THÊM
+import http from '@/apis/http'
+import { UserOutlined } from '@ant-design/icons'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const nav = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const navigate = useNavigate()
 
-  // Dữ liệu demo đơn hàng theo bàn (mỗi món có qty và price)
+  // --- LẤY ID VÀ DỮ LIỆU GIỎ HÀNG ---
+  const mongoTableId = localStorage.getItem('currentTableId')
+  const userString = localStorage.getItem('user')
+  const userData = useMemo(() => (userString ? JSON.parse(userString) : null), [userString])
+  const userId = userData?._id
+  const userName = userData?.username || 'Tài khoản' // Lấy tên user
+
+  const { data: cartData } = useQuery({
+    queryKey: ['cart', mongoTableId, userId],
+    queryFn: async () => {
+      if (!mongoTableId || !userId) return null
+      try {
+        const res = await http.get(`/cart/cart-item/${mongoTableId}/${userId}`)
+        console.log('Header: API GET /cart trả về:', res)
+        return res?.data
+      } catch (error) {
+        console.error('Header: Lỗi lấy giỏ hàng:', error)
+        return null
+      }
+    },
+    enabled: !!mongoTableId && !!userId,
+    staleTime: 1000 * 30,
+  })
+
+  // Tính tổng số lượng
+  const totalItemCount = useMemo(() => {
+    if (!cartData || !cartData.items) return 0
+    return cartData.items.reduce((sum, item) => sum + item.quantity, 0)
+  }, [cartData])
+
+  // Hàm Đăng xuất
+  const handleLogout = () => {
+    localStorage.removeItem('user')
+    localStorage.removeItem('token')
+    localStorage.removeItem('currentTableId')
+    localStorage.removeItem('currentQrCode')
+    window.location.href = '/flareon/login' // <<<--- SỬA LẠI ĐƯỜNG DẪN LOGIN
+  }
+  // --- KẾT THÚC PHẦN LOGIC MỚI ---
+
+  // Dữ liệu demo đơn hàng (GIỮ NGUYÊN)
   const orders = [
     {
       id: 1,
@@ -33,57 +71,34 @@ const Header = () => {
         { name: 'Nước suối', qty: 1, price: 8000 },
       ],
     },
-    {
-      id: 3,
-      table: 'Bàn 05',
-      items: [{ name: 'Trà sữa truyền thống', qty: 2, price: 30000 }],
-    },
   ]
 
   const openOrderDetail = (order) => {
-    // Tạo thời gian demo: start trước 30-120 phút, payment = now
     const now = new Date()
     const minutesAgo = Math.floor(30 + Math.random() * 90)
     const startTime = new Date(now.getTime() - minutesAgo * 60 * 1000).toISOString()
     const paymentTime = now.toISOString()
-
     setIsModalOpen(false)
-    navigate(`/orders/${order.id}`, {
+    // Sửa lại đường dẫn Order Detail (nếu cần)
+    navigate(`/flareon/order/${order.id}`, {
+      // <<<--- SỬA LẠI ĐƯỜNG DẪN
       state: { order, startTime, paymentTime },
     })
   }
 
-  // Lấy trạng thái và hàm từ Context
-  const { isLoggedIn, logout } = useAuth()
-
-  // LẤY THÔNG TIN USER (Đọc từ Local Storage đã được lưu trong hàm login)
-  // Đảm bảo Local Storage có key 'userData' và nó là JSON string
-  const userData = JSON.parse(localStorage.getItem('userData') || '{}')
-  const userName = userData.username || 'Tài khoản'
-
-  // Hàm xử lý Đăng xuất
-  const handleLogout = () => {
-    logout()
-    setIsMenuOpen(false)
-    nav('/')
-  }
-
-  // 💥 CẤU TRÚC MENU DROPDOWN (Ant Design items) 💥
+  // --- Cấu trúc menu dropdown cho user ---
   const userMenuItems = [
     {
       key: 'profile',
-      label: <NavLink to="profile">Hồ sơ của tôi</NavLink>,
+      label: <NavLink to="/flareon/profile">Hồ sơ của tôi</NavLink>, // <<<--- SỬA LẠI ĐƯỜNG DẪN
       icon: <User size={16} />,
     },
     {
       key: 'orders',
-      // Đường dẫn đến trang danh sách đơn hàng
-      label: <NavLink to="orders">Đơn hàng của tôi</NavLink>,
+      label: <NavLink to="/flareon/orders">Đơn hàng của tôi</NavLink>, // <<<--- SỬA LẠI ĐƯỜNG DẪN
       icon: <Receipt size={16} />,
     },
-    {
-      type: 'divider',
-    },
+    { type: 'divider' },
     {
       key: 'logout',
       label: (
@@ -95,84 +110,97 @@ const Header = () => {
     },
   ]
 
-  // 💥 COMPONENT DROPDOWN DÀNH CHO DESKTOP (KHI ĐÃ ĐĂNG NHẬP) 💥
   const UserDropdown = () => (
     <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" arrow trigger={['click']}>
       <div className="flex items-center gap-2 cursor-pointer p-2 rounded-full hover:bg-gray-100 transition-colors">
-        <User className="w-6 h-6 text-orange-500" />
-        {/* Chỉ hiển thị tên user trên màn hình lớn */}
+        <Avatar>{userData.username?.charAt(0).toUpperCase() || <UserOutlined />}</Avatar>
         <span className="hidden lg:inline text-gray-700 font-semibold">{userName}</span>
       </div>
     </Dropdown>
   )
 
-  // Component phụ trách render các nút Đăng nhập/Đăng ký/Đăng xuất
-  const AuthButtons = ({ isMobile = false }) => {
-    if (isLoggedIn) {
-      if (isMobile) {
-        // Trên Mobile, hiển thị nút Đăng xuất đầy đủ
-        return (
-          <AntButton type="primary" onClick={handleLogout} icon={<LogOut className="w-4 h-4" />}>
-            Đăng xuất ({userName})
-          </AntButton>
-        )
-      }
-      // Trên Desktop, hiển thị Dropdown Icon
-      return <UserDropdown />
-    }
-
-    // Nếu chưa đăng nhập: Hiển thị Đăng nhập/Đăng ký
-    return (
-      <>
-        <AntButton onClick={() => nav('login')} type="primary">
-          Đăng nhập
-        </AntButton>
-        <AntButton onClick={() => nav('register')}>Đăng ký</AntButton>
-      </>
-    )
-  }
-
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
       <nav className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          {/* LOGO (GIỮ NGUYÊN) */}
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={() => navigate('/flareon')}
+          >
+            {' '}
+            {/* <<< SỬA LẠI */}
             <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
               <FlameKindling className="w-6 h-6 text-white" />
             </div>
             <span className="text-xl text-gray-900 font-semibold">Flareon</span>
           </div>
 
+          {/* MENU DESKTOP (SỬA LẠI ĐƯỜNG DẪN) */}
           <div className="hidden md:flex items-center gap-8">
-            <NavLink to="/" className="text-gray-700 hover:text-orange-500 transition-colors">
+            <NavLink
+              to="/flareon"
+              className="text-gray-700 hover:text-orange-500 transition-colors"
+            >
+              {' '}
+              {/* <<< SỬA LẠI */}
               Trang chủ
             </NavLink>
             <NavLink
-              to="/features"
+              to="/flareon/about" // <<< SỬA LẠI (Hoặc /features nếu bạn có)
               className="text-gray-700 hover:text-orange-500 transition-colors"
             >
-              Tính năng
+              Về chúng tôi
             </NavLink>
             <NavLink
-              to="category"
+              to="/flareon/category" // <<< SỬA LẠI
               className="text-gray-700 hover:text-orange-500 transition-colors"
             >
-              Danh mục
-            </NavLink>
-            <NavLink to="dishes" className="text-gray-700 hover:text-orange-500 transition-colors">
               Món ăn
             </NavLink>
-            <NavLink to="contact" className="text-gray-700 hover:text-orange-500 transition-colors">
+            <NavLink
+              to="/flareon/contact" // <<< SỬA LẠI
+              className="text-gray-700 hover:text-orange-500 transition-colors"
+            >
               Liên hệ
             </NavLink>
           </div>
 
-          {/* 💥 VÙNG NÚT DESKTOP: Hiển thị Dropdown Icon (khi đã đăng nhập) 💥 */}
-          <div className="hidden md:flex items-center gap-4">
-            <AuthButtons />
+          {/* NÚT CHỨC NĂNG BÊN PHẢI (ĐÃ SỬA) */}
+          <div className="hidden md:flex items-center gap-3">
+            {/* NÚT GIỎ HÀNG */}
+            <Button
+              type="text"
+              className="!flex !items-center !justify-center"
+              onClick={() => navigate('/flareon/cart')} // <<< SỬA LẠI
+              aria-label="Giỏ hàng"
+            >
+              <Badge count={totalItemCount} size="small" offset={[0, 2]}>
+                <ShoppingCart className="w-5 h-5 text-gray-700 hover:text-orange-500" />
+              </Badge>
+            </Button>
+
+            {/* Nút xem lịch sử đơn hàng (GIỮ NGUYÊN) */}
+            <Button type="default" icon={<Clock />} onClick={() => setIsModalOpen(true)}>
+              Lịch sử đơn hàng
+            </Button>
+
+            {/* LOGIC ĐĂNG NHẬP/ĐĂNG XUẤT */}
+            {userData ? (
+              <UserDropdown /> // Hiển thị dropdown nếu đã đăng nhập
+            ) : (
+              <>
+                <AntButton onClick={() => navigate('/flareon/login')} type="primary">
+                  Đăng nhập
+                </AntButton>{' '}
+                {/* <<< SỬA LẠI */}
+                <AntButton onClick={() => navigate('/flareon/register')}>Đăng ký</AntButton>{' '}
+                {/* <<< SỬA LẠI */}
+              </>
+            )}
           </div>
 
-          {/* Toggle Menu Mobile */}
+          {/* NÚT MENU MOBILE (GIỮ NGUYÊN) */}
           <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? (
               <X className="w-6 h-6 text-gray-700" />
@@ -182,50 +210,101 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Menu Mobile */}
+        {/* MENU MOBILE (ĐÃ SỬA) */}
         {isMenuOpen && (
           <div className="md:hidden mt-4 py-4 border-t border-gray-200">
             <div className="flex flex-col gap-4">
-              {/* Menu items mobile */}
               <NavLink
-                to="/"
+                to="/flareon"
                 className="text-gray-700 hover:text-orange-500 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
               >
                 Trang chủ
-              </NavLink>
+              </NavLink>{' '}
+              {/* <<< SỬA LẠI */}
               <NavLink
-                to="/features"
+                to="/flareon/about"
                 className="text-gray-700 hover:text-orange-500 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
               >
-                Tính năng
-              </NavLink>
+                Về chúng tôi
+              </NavLink>{' '}
+              {/* <<< SỬA LẠI */}
               <NavLink
-                to="/categories"
+                to="/flareon/category"
                 className="text-gray-700 hover:text-orange-500 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
               >
-                Danh mục
-              </NavLink>
+                Món ăn
+              </NavLink>{' '}
+              {/* <<< SỬA LẠI */}
               <NavLink
-                to="/contact"
+                to="/flareon/contact"
                 className="text-gray-700 hover:text-orange-500 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
               >
                 Liên hệ
-              </NavLink>
-
-              {/* 💥 VÙNG NÚT MOBILE: Hiển thị nút đầy đủ 💥 */}
+              </NavLink>{' '}
+              {/* <<< SỬA LẠI */}
+              {/* GIỎ HÀNG (MOBILE) */}
+              <Button
+                type="default"
+                icon={<Badge count={totalItemCount}></Badge>}
+                onClick={() => {
+                  navigate('/flareon/cart')
+                  setIsMenuOpen(false)
+                }} // <<< SỬA LẠI
+              >
+                Giỏ hàng ({totalItemCount})
+              </Button>
+              <Button
+                type="default"
+                icon={<Clock />}
+                onClick={() => {
+                  setIsModalOpen(true)
+                  setIsMenuOpen(false)
+                }}
+              >
+                Lịch sử đơn hàng
+              </Button>
+              {/* ĐĂNG NHẬP/ĐĂNG XUẤT (MOBILE) */}
               <div className="flex flex-col gap-2 pt-4 border-t border-gray-200">
-                <AuthButtons isMobile={true} />
+                {userData ? (
+                  <>
+                    <NavLink to="/flareon/profile" className="text-gray-700 font-semibold p-2 ...">
+                      Chào, {userName}
+                    </NavLink>{' '}
+                    {/* <<< SỬA LẠI */}
+                    <AntButton onClick={handleLogout} danger>
+                      Đăng xuất
+                    </AntButton>
+                  </>
+                ) : (
+                  <>
+                    <AntButton
+                      onClick={() => {
+                        navigate('/flareon/login')
+                        setIsMenuOpen(false)
+                      }}
+                      type="primary"
+                    >
+                      Đăng nhập
+                    </AntButton>{' '}
+                    {/* <<< SỬA LẠI */}
+                    <AntButton
+                      onClick={() => {
+                        navigate('/flareon/register')
+                        setIsMenuOpen(false)
+                      }}
+                    >
+                      Đăng ký
+                    </AntButton>{' '}
+                    {/* <<< SỬA LẠI */}
+                  </>
+                )}
               </div>
             </div>
           </div>
         )}
       </nav>
 
-      {/* MODAL HIỂN THỊ LỊCH SỬ ĐƠN HÀNG */}
+      {/* MODAL LỊCH SỬ ĐƠN HÀNG (ĐÃ SỬA LỖI CÚ PHÁP) */}
       <Modal
         title="🧾 Lịch sử đơn hàng theo bàn"
         open={isModalOpen}
@@ -238,13 +317,13 @@ const Header = () => {
           renderItem={(order) => {
             const total = order.items.reduce((sum, it) => sum + it.qty * it.price, 0)
             const formatVnd = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + 'đ'
-
             return (
               <List.Item
                 key={order.id}
                 className="cursor-pointer hover:bg-gray-50"
                 onClick={() => openOrderDetail(order)}
               >
+                {/* Dòng "id:" bị thừa đã được XÓA */}
                 <List.Item.Meta
                   title={<span className="font-semibold">{order.table}</span>}
                   description={

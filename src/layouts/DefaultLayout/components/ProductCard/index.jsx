@@ -63,5 +63,4 @@ const ProductGrid = ({ products, onAddToCart }) => {
     </div>
   )
 }
-
 export default ProductGrid
