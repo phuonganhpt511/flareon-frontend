@@ -1,149 +1,147 @@
-import { useEffect, useState } from "react";
-import { Tag, Button } from "antd";
-import { Star, Clock } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import http from "@/apis/http";
+import React from 'react' // Import React
+import { useQuery } from '@tanstack/react-query' // 1. Import useQuery
+import http from '@/apis/http' // 2. Import http client
+import { Eye, Star, Clock } from 'lucide-react'
+import { Tag, Button } from 'antd' // Giữ lại import của Ant Design
+import { useNavigate } from 'react-router'
 
 const Products = () => {
-  const [products, setProducts] = useState([]);
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const {
+    data: products = [],
+    isLoading,
+    error,
+    isError,
+  } = useQuery({
+    queryKey: ['dishes'],
+    queryFn: async () => {
+      console.log('Đang gọi API GET /dishes...')
+      const res = await http.get('/dishes') // Gọi API
+      console.log('API GET /dishes trả về:', res)
 
-  // Lấy danh sách món ăn từ BE
-  useEffect(() => {
-    http
-      .get("/dishes")
-      .then((res) => {
-        setProducts(res.data);
-      })
-      .catch((err) => {
-        console.error("Lỗi khi tải danh sách món ăn:", err);
-      });
-  }, []);
+      // Trả về mảng 'data' bên trong object response
+      if (res && Array.isArray(res.data)) {
+        // Map dữ liệu API sang cấu trúc component cần
+        return res.data.map((dish) => ({
+          id: dish._id,
+          name: dish.dish_name,
+          description: dish.description,
+          price: dish.price,
+          image: dish.imageUrl,
+          category: dish.category_id?.category_name || 'Chưa phân loại',
+        }))
+      }
+      return []
+    },
+  })
 
-  // Hàm thêm vào giỏ hàng
-  const addToCart = (product) => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  // --- XỬ LÝ TRẠNG THÁI LOADING/ERROR ---
+  if (isLoading) {
+    return (
+      <section className="py-20 px-4 bg-white">
+        <p className="text-center text-gray-600">Đang tải sản phẩm...</p>
+      </section>
+    )
+  }
 
-    const existing = cart.find((item) => item._id === product._id);
+  if (isError) {
+    return (
+      <section className="py-20 px-4 bg-white">
+        <p className="text-center text-red-500">
+          Lỗi khi tải sản phẩm: {error?.message || 'Unknown error'}
+        </p>
+      </section>
+    )
+  }
+  const handleViewDetails = (productId) => {
+    console.log('Chuyển đến chi tiết sản phẩm:', productId)
+    navigate(`/product/${productId}`) // Chuyển trang
+  }
 
-    if (existing) {
-      existing.quantity += 1;
-    } else {
-      cart.push({ ...product, quantity: 1 });
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-    navigate("/cart");
-  };
-
+  // --- RENDER GIAO DIỆN VỚI DỮ LIỆU THẬT ---
   return (
     <>
       <section className="py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
+          {/* Phần tiêu đề giữ nguyên */}
           <div className="text-center mb-16">
             <div className="inline-block bg-orange-100 text-orange-600 px-4 py-2 rounded-full mb-4">
               Món ngon đề xuất
             </div>
-            <h2 className="text-4xl md:text-5xl mb-4 text-gray-900">
-              Món ăn nổi bật
-            </h2>
-            <p className="text-xl text-gray-600">
-              Những món ăn được yêu thích nhất tại nhà hàng
-            </p>
+            <h2 className="text-4xl md:text-5xl mb-4 text-gray-900">Món ăn nổi bật</h2>
+            <p className="text-xl text-gray-600">Những món ăn được yêu thích nhất tại nhà hàng</p>
           </div>
 
+          {/* Grid hiển thị sản phẩm */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.length === 0 && (
-              <p className="text-gray-500 text-center col-span-3">
-                Không có sản phẩm nào.
-              </p>
-            )}
-
-            {products.map((product) => (
-              <div
-                key={product._id}
-                className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-orange-200 cursor-pointer"
-                onClick={() => navigate(`/product/${product._id}`)}
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-
-                <div className="p-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Tag
-                      bordered={false}
-                      className="text-orange-500 bg-orange-100 px-3 py-1 rounded-full"
-                    >
-                      {product.category?.name || "Chưa phân loại"}
-                    </Tag>
+            {products.length === 0 ? (
+              <p className="col-span-full text-center text-gray-500">Không có sản phẩm nào.</p>
+            ) : (
+              products.map((product) => (
+                <div
+                  key={product.id} // Dùng id đã map
+                  className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-orange-200"
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={product.image || 'https://via.placeholder.com/300'} // Ảnh sản phẩm, có fallback
+                      alt={product.name || 'Ảnh món ăn'}
+                      className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                   </div>
 
-                  <h3 className="text-xl mb-2 text-gray-900 group-hover:text-orange-500 transition-colors">
-                    {product.name}
-                  </h3>
-
-                  <p className="text-gray-600 mb-4 line-clamp-2">
-                    {product.description}
-                  </p>
-
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-1 text-amber-500">
-                      <Star className="w-4 h-4 fill-current" />
-                      <span>{product.rating || 4.5}</span>
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      {/* Hiển thị category */}
+                      <Tag variant="outline" className="text-orange-500 border-orange-300">
+                        {product.category || 'N/A'}
+                      </Tag>
+                      {/* Có thể thêm tag isPopular nếu cần */}
                     </div>
-                    <div className="flex items-center gap-1 text-gray-500">
-                      <Clock className="w-4 h-4" />
-                      <span className="text-sm">
-                        {product.prepTime || "10 phút"}
+
+                    {/* Tên sản phẩm */}
+                    <h3 className="text-xl mb-2 text-gray-900 group-hover:text-orange-500 transition-colors">
+                      {product.name || 'N/A'}
+                    </h3>
+
+                    {/* Mô tả */}
+                    <p className="text-gray-600 mb-4 line-clamp-2">{product.description || ''}</p>
+
+                    {/* Rating và Thời gian chuẩn bị */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-1 text-amber-500">
+                        <Star className="w-4 h-4 fill-current" />
+                        <span>{product.rating?.toFixed(1) || 'N/A'}</span> {/* Định dạng rating */}
+                      </div>
+                      <div className="flex items-center gap-1 text-gray-500">
+                        <Clock className="w-4 h-4" />
+                        <span className="text-sm">{product.prepTime || 'N/A'}</span>
+                      </div>
+                    </div>
+
+                    {/* Giá và Nút chi tiết */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                      <span className="text-2xl text-orange-500">
+                        {/* Định dạng giá tiền */}
+                        {(product.price ?? 0).toLocaleString('vi-VN')}đ
                       </span>
-                    </div>
-                  </div>
-
-                  {/* ✅ PHẦN GIÁ + NÚT */}
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <span className="text-2xl text-orange-500">
-                      {product.price.toLocaleString("vi-VN")}đ
-                    </span>
-
-                    <div className="flex gap-2">
-                      {/* Nút Chi tiết */}
                       <Button
+                        onClick={() => handleViewDetails(product.id)}
                         variant="outline"
                         className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/product/${product._id}`);
-                        }}
                       >
                         Chi tiết
                       </Button>
-
-                      {/* ✅ Nút + Giỏ hàng */}
-                      <Button
-                        type="primary"
-                        className="bg-orange-500 text-white hover:bg-orange-600"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          addToCart(product);
-                        }}
-                      >
-                        + Giỏ hàng
-                      </Button>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>
     </>
-  );
-};
+  )
+}
 
-export default Products;
+export default Products

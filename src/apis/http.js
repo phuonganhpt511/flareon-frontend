@@ -2,7 +2,6 @@
 import axios from 'axios'
 
 const http = axios.create({
-  // 1. Dùng link API MỚI (backend-2)
   baseURL: import.meta.env.VITE_API_URL || 'https://api-datn-orderfood-backend-2.onrender.com',
   timeout: 10000,
   headers: {
@@ -15,8 +14,8 @@ http.interceptors.request.use(
   function (config) {
     const token = localStorage.getItem('token')
     if (token) {
-      // 2. ĐÃ SỬA: Xóa JSON.parse()
       config.headers['Authorization'] = `Bearer ${token}`
+      // config.headers['Authorization'] = `Bearer ${JSON.parse(token)}`
     }
     return config
   },

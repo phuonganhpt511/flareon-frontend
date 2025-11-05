@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, Input, Form, Typography, Divider, notification } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
-
+// IMPORT THƯ VIỆN & HOOKS
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import authAPI from '@/apis/auth/auth.api';
@@ -16,7 +16,7 @@ const Register = () => {
   const navigate = useNavigate()
   const [form] = Form.useForm()
 
-
+  // --- LOGIC GỌI API ĐĂNG KÝ (GIỮ NGUYÊN) ---
   const registerMutation = useMutation({
     mutationFn: (payload) => authAPI.register(payload),
 
@@ -26,11 +26,11 @@ const Register = () => {
         description: data.message || 'Vui lòng đăng nhập để tiếp tục.',
         placement: 'topRight',
       })
-      navigate('/login') 
+      navigate('/login') // Chuyển hướng về trang đăng nhập
     },
 
     onError: (error) => {
- 
+      // Cải thiện logic hiển thị lỗi validation từ Backend
       let displayMessage = 'Đăng ký thất bại. Lỗi không xác định.';
       if (error.response?.data?.message) {
         // Xử lý lỗi validation từ MongoDB/Mongoose
@@ -84,7 +84,8 @@ const Register = () => {
         </div>
 
         <Form form={form} layout="vertical" onFinish={onFinish}>
-{/* Trường Tên (Sử dụng 'name' nhưng gửi 'username' trong payload) */}
+
+          {/* Trường Tên (Sử dụng 'name' nhưng gửi 'username' trong payload) */}
           <Form.Item
             name="name"
             rules={[{ required: true, message: 'Vui lòng nhập Tên của bạn!' }]}
@@ -168,7 +169,7 @@ const Register = () => {
               type="primary"
               htmlType="submit"
               block
-size="large"
+              size="large"
               loading={registerMutation.isPending}
               className="!h-14 !rounded-lg !text-xl !font-bold !bg-orange-500 hover:!bg-orange-600 !border-none"
             >
@@ -205,25 +206,22 @@ size="large"
           </Button>
         </div>
 
-        {/*privacy policy */}
-        <div className="text-center text-xs text-gray-500 mb-20 px-4 mt-10">
-          <Text type="secondary" className="!text-gray-500 text-sm">
-            By clicking continue, you agree to our
-            <Link href="/terms" className="!font-bold !text-gray-800 hover:!text-orange-500">
-              {' '}
-              Terms of Service{' '}
-            </Link>
-            and
-            <br />
-            <Link href="/privacy" className="!font-bold !text-gray-800 hover:!text-orange-500">
-              {' '}
-              Privacy Policy
-            </Link>
-          </Text>
+                <div className="text-center text-xs text-gray-500 mb-20 px-4 mt-10">
+                    <Text type="secondary" className="!text-gray-500 text-sm">
+                        Bằng cách đăng ký, bạn đồng ý với
+                        <Link href="/terms" className="!font-bold !text-gray-800 hover:!text-orange-500">
+                            {' '}Điều khoản dịch vụ{' '}
+                        </Link>
+                        và
+                        <br />
+                        <Link href="/privacy" className="!font-bold !text-gray-800 hover:!text-orange-500">
+                            {' '}Chính sách bảo mật
+                        </Link>
+                    </Text>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  )
+    )
 }
 
 export default Register

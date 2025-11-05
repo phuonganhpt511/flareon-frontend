@@ -21,45 +21,47 @@ const Login = () => {
 
     onSuccess: (data) => {
       // Giả định Backend trả về: { token: '...', user: { _id: '...', ... } }
-      const token = data.token || data.accessToken;
-      const userObject = data.user; // Lấy toàn bộ đối tượng user
+      const token = data.token || data.accessToken
+      const userObject = data.user // Lấy toàn bộ đối tượng user
 
-      if (token && userObject && userObject._id) { // Kiểm tra token và user object hợp lệ
+      if (token && userObject && userObject._id) {
+        // Kiểm tra token và user object hợp lệ
         // 1. LƯU TOKEN
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', token)
 
         // 2. ✅ SỬA: LƯU TOÀN BỘ OBJECT USER (DƯỚI DẠNG CHUỖI JSON) VÀO KEY 'user'
-        //    Điều này khớp với logic mà hàm handleAddToCart đang tìm kiếm
-        localStorage.setItem('user', JSON.stringify(userObject));
+        //    Điều này khớp với logic mà hàm handleAddToCart đang tìm kiếm
+        localStorage.setItem('user', JSON.stringify(userObject))
 
         // ⚠️ Xóa userId riêng để tránh nhầm lẫn (có thể bỏ qua nếu bạn không lưu userId riêng ở đâu khác)
-        localStorage.removeItem('userId');
+        localStorage.removeItem('userId')
 
         notification.success({
           message: 'Đăng nhập thành công! 🎉',
           description: 'Chào mừng trở lại! Đang chuyển hướng...',
           placement: 'topRight',
-        });
+        })
 
         // Chuyển hướng về trang chủ
-        navigate('/');
+        navigate('/')
       } else {
         notification.error({
           message: 'Lỗi Dữ liệu',
           description: 'Phản hồi từ máy chủ không chứa token hoặc ID người dùng hợp lệ.',
           placement: 'topRight',
-        });
+        })
       }
     },
 
     onError: (error) => {
       console.error('Lỗi đăng nhập:', error.response?.data)
-      const message = error.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.';
+      const message =
+        error.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.'
       notification.error({
         message: 'Lỗi Đăng nhập',
         description: message,
         placement: 'topRight',
-      });
+      })
     },
   })
 
@@ -78,7 +80,7 @@ const Login = () => {
         <Link
           onClick={() => navigate('/')}
           className="flex items-center !text-lg !text-orange-500 !hover:text-orange-500 font-bold cursor-pointer"
->
+        >
           <ArrowLeftOutlined className="mr-1" />
           Quay lại
         </Link>
@@ -93,12 +95,11 @@ const Login = () => {
         </div>
 
         <Form form={form} layout="vertical" onFinish={onFinish}>
-
           <Form.Item
             name="email" // Trường Email
             rules={[
               { required: true, message: 'Vui lòng nhập Email!' },
-              { type: 'email', message: 'Email không đúng định dạng!' }
+              { type: 'email', message: 'Email không đúng định dạng!' },
             ]}
           >
             <Input
@@ -161,19 +162,20 @@ const Login = () => {
           </Button>
         </div>
 
-        {/*privacy policy */}
+        {/* <-- **SỬA:** XÓA KHỐI BUTTON BỊ LẶP LẠI VÀ THẺ DIV THỪA Ở ĐÂY --> */}
+
+        {/* Chính sách */}
         <div className="text-center text-xs text-gray-500 mb-20 px-4 mt-10">
           <Text type="secondary" className="!text-gray-500 text-sm">
-By clicking continue, you agree to our
+            Bằng cách tiếp tục, bạn đồng ý với
             <Link href="/terms" className="!font-bold !text-gray-800 hover:!text-orange-500">
               {' '}
-              Terms of Service{' '}
+              Điều khoản sử dụng{' '}
             </Link>
-            and
-            <br />
+            và
             <Link href="/privacy" className="!font-bold !text-gray-800 hover:!text-orange-500">
               {' '}
-              Privacy Policy
+              Chính sách bảo mật
             </Link>
           </Text>
         </div>

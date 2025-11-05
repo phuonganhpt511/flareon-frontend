@@ -39,7 +39,6 @@ const AppRoutes = () => {
           <Route path="reviews" element={<ReviewManagement />} />
           <Route path="staffs" element={<StaffManagement />} />
           <Route path="users" element={<UserManagement />} />
-          
         </Route>
 
         {/* Default layout pages */}
