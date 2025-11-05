@@ -1,6 +1,6 @@
 // src/pages/client/CategoryPage/index.jsx
 import React, { useEffect } from 'react' // Thêm useEffect
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import http from '@/apis/http'
 import { useParams, useNavigate, useLocation } from 'react-router' // Thêm hooks
 import Banner from '@/layouts/DefaultLayout/components/Banner'
@@ -10,7 +10,7 @@ const CategoryPage = () => {
   const { tableId: qrCode } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  // const queryClient = useQueryClient()
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     if (qrCode) {
